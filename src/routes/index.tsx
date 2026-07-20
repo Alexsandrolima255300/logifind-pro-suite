@@ -1,21 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
-import { Dashboard } from "@/components/dashboard";
+import { QuoteHome } from "@/components/quote-home";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "LogiFinder — Cotação de Fretes para Grandes Operações" },
+      { title: "LogiFinder — Cotação Inteligente de Fretes" },
       {
         name: "description",
         content:
-          "Plataforma premium de cotação de fretes integrada a Rodonaves, Braspress, Jadlog e Alfa Transportes. Compare, negocie e economize em segundos.",
+          "Cotação de frete em tempo real com as principais transportadoras do Brasil. Compare valores, prazos e economize.",
       },
       { property: "og:title", content: "LogiFinder — Cotação Inteligente de Fretes" },
       {
         property: "og:description",
         content:
-          "Compare cotações das principais transportadoras do Brasil em uma única plataforma. Economia, controle e velocidade para grandes operações logísticas.",
+          "Encontre o melhor frete em segundos. Rodonaves, Braspress, Jadlog, Alfa Transportes e mais em uma única plataforma.",
       },
     ],
   }),
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <AppLayout>
-      <Dashboard />
+      <QuoteHome />
     </AppLayout>
   );
 }
