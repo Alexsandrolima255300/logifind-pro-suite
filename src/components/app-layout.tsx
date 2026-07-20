@@ -5,8 +5,7 @@ import {
   Search,
   Truck,
   FileText,
-  BarChart3,
-  Users,
+  MapPin,
   Settings,
   ChevronLeft,
   Bell,
@@ -18,10 +17,9 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/cotacao", label: "Nova Cotação", icon: Search },
-  { to: "/embarques", label: "Embarques", icon: Truck },
-  { to: "/documentos", label: "Documentos", icon: FileText },
-  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
-  { to: "/clientes", label: "Clientes", icon: Users },
+  { to: "/transportadoras", label: "Transportadoras", icon: Truck },
+  { to: "/cidades", label: "Cidades", icon: MapPin },
+  { to: "/historico", label: "Histórico", icon: FileText },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
