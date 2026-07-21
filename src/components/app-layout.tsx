@@ -11,17 +11,33 @@ import {
   Bell,
   Package,
   LogOut,
+  ShoppingCart,
+  Users,
+  UserCircle,
+  BarChart3,
+  Radar,
+  BadgeDollarSign,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AIFab } from "./ai-fab";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/cotacao", label: "Nova Cotação", icon: Search },
+  { to: "/pedidos", label: "Pedidos", icon: ShoppingCart },
+  { to: "/rastreamento", label: "Rastreamento", icon: Radar },
+  { to: "/vendedor", label: "Painel do Vendedor", icon: BadgeDollarSign },
   { to: "/transportadoras", label: "Transportadoras", icon: Truck },
+  { to: "/clientes", label: "Clientes", icon: Building2 },
   { to: "/cidades", label: "Cidades", icon: MapPin },
   { to: "/historico", label: "Histórico", icon: FileText },
+  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/notificacoes", label: "Notificações", icon: Bell },
+  { to: "/usuarios", label: "Usuários", icon: Users },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
-];
+  { to: "/perfil", label: "Meu Perfil", icon: UserCircle },
+] as const;
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -30,7 +46,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full text-foreground">
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in"
@@ -46,8 +61,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           mobileOpen ? "left-0" : "-left-72 md:left-0",
         )}
       >
-        {/* Logo */}
-        <div className="flex h-16 items-center gap-3 px-5 border-b border-white/[0.05]">
+        <div className="flex h-16 items-center gap-3 px-5 border-b border-white/[0.05] shrink-0">
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-emerald-600 shadow-[0_0_20px_-4px_oklch(0.74_0.18_152/0.6)]">
             <Package className="h-5 w-5 text-black" strokeWidth={2.5} />
             <span className="absolute inset-0 rounded-xl animate-pulse-ring" />
@@ -56,12 +70,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="text-[15px] font-bold tracking-tight leading-tight">
               Logi<span className="text-gradient-green">Finder</span>
             </div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Cotação Inteligente</div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">TMS · Cotação Inteligente</div>
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
           {nav.map((item, i) => {
             const active = pathname === item.to;
             const Icon = item.icon;
@@ -71,15 +84,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 to={item.to}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300",
+                  "group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300",
                   active
                     ? "bg-primary/10 text-primary shadow-[inset_0_1px_0_oklch(1_0_0/0.05)]"
                     : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
                 )}
-                style={{ animationDelay: `${i * 40}ms` }}
+                style={{ animationDelay: `${i * 30}ms` }}
               >
                 {active && (
-                  <span className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_oklch(0.74_0.18_152/0.8)]" />
+                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_oklch(0.74_0.18_152/0.8)]" />
                 )}
                 <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2} />
                 <span className={cn("truncate transition-opacity", collapsed && "md:opacity-0 md:pointer-events-none md:w-0")}>
@@ -90,24 +103,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-white/[0.05] p-3 space-y-2">
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-xl px-2 py-2",
-              collapsed && "md:justify-center",
-            )}
-          >
+        <div className="border-t border-white/[0.05] p-3 space-y-2 shrink-0">
+          <div className={cn("flex items-center gap-3 rounded-xl px-2 py-2", collapsed && "md:justify-center")}>
             <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-emerald-500/40 to-emerald-800/40 border border-white/10 flex items-center justify-center text-xs font-bold">
               MC
             </div>
             <div className={cn("min-w-0 flex-1", collapsed && "md:hidden")}>
               <div className="text-xs font-semibold truncate">Marcos Costa</div>
-              <div className="text-[10px] text-muted-foreground truncate">Gestor de Logística</div>
+              <div className="text-[10px] text-muted-foreground truncate">Administrador</div>
             </div>
-            <button className={cn("text-muted-foreground hover:text-foreground transition", collapsed && "md:hidden")}>
+            <Link to="/login" className={cn("text-muted-foreground hover:text-foreground transition", collapsed && "md:hidden")}>
               <LogOut className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -119,7 +126,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* Main */}
       <div
         className={cn(
           "flex-1 flex flex-col min-w-0 transition-all duration-500",
@@ -142,7 +148,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Buscar cotações, embarques, transportadoras..."
+                placeholder="Buscar pedidos, clientes, transportadoras…"
                 className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition"
               />
             </div>
@@ -151,19 +157,27 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="flex-1 md:hidden" />
 
           <div className="flex items-center gap-2">
-            <button className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition">
+            <Link
+              to="/notificacoes"
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition"
+            >
               <Bell className="h-4 w-4" />
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_oklch(0.74_0.18_152)]" />
-            </button>
-            <button className="hidden md:inline-flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-emerald-600 px-4 text-sm font-semibold text-black shadow-[0_8px_24px_-8px_oklch(0.74_0.18_152/0.6)] hover:brightness-110 transition">
+            </Link>
+            <Link
+              to="/cotacao"
+              className="hidden md:inline-flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-emerald-600 px-4 text-sm font-semibold text-black shadow-[0_8px_24px_-8px_oklch(0.74_0.18_152/0.6)] hover:brightness-110 transition"
+            >
               <Search className="h-4 w-4" strokeWidth={2.5} />
               Nova Cotação
-            </button>
+            </Link>
           </div>
         </header>
 
         <main className="flex-1 grid-noise">{children}</main>
       </div>
+
+      <AIFab />
     </div>
   );
 }
