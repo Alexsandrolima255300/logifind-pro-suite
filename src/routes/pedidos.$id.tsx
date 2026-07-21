@@ -87,7 +87,7 @@ function PedidoDetalhe() {
             <Hash className="h-4 w-4 text-primary" /> Produtos
           </div>
           <div className="divide-y divide-white/[0.04]">
-            {pedido.produtos.map((p, i) => (
+            {pedido.produtos.map((p: { descricao: string; qtd: number }, i: number) => (
               <div key={i} className="flex items-center justify-between py-3 text-sm">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">

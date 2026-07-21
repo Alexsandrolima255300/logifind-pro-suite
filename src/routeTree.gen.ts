@@ -9,38 +9,354 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VendedorRouteImport } from './routes/vendedor'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as TransportadorasRouteImport } from './routes/transportadoras'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as RastreamentoRouteImport } from './routes/rastreamento'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as PedidosRouteImport } from './routes/pedidos'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as CotacaoRouteImport } from './routes/cotacao'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as CidadesRouteImport } from './routes/cidades'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PedidosIdRouteImport } from './routes/pedidos.$id'
 
+const VendedorRoute = VendedorRouteImport.update({
+  id: '/vendedor',
+  path: '/vendedor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransportadorasRoute = TransportadorasRouteImport.update({
+  id: '/transportadoras',
+  path: '/transportadoras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RastreamentoRoute = RastreamentoRouteImport.update({
+  id: '/rastreamento',
+  path: '/rastreamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidosRoute = PedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoricoRoute = HistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CotacaoRoute = CotacaoRouteImport.update({
+  id: '/cotacao',
+  path: '/cotacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CidadesRoute = CidadesRouteImport.update({
+  id: '/cidades',
+  path: '/cidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PedidosIdRoute = PedidosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PedidosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cidades': typeof CidadesRoute
+  '/clientes': typeof ClientesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/cotacao': typeof CotacaoRoute
+  '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/pedidos': typeof PedidosRouteWithChildren
+  '/perfil': typeof PerfilRoute
+  '/portal': typeof PortalRoute
+  '/rastreamento': typeof RastreamentoRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/transportadoras': typeof TransportadorasRoute
+  '/usuarios': typeof UsuariosRoute
+  '/vendedor': typeof VendedorRoute
+  '/pedidos/$id': typeof PedidosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cidades': typeof CidadesRoute
+  '/clientes': typeof ClientesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/cotacao': typeof CotacaoRoute
+  '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/pedidos': typeof PedidosRouteWithChildren
+  '/perfil': typeof PerfilRoute
+  '/portal': typeof PortalRoute
+  '/rastreamento': typeof RastreamentoRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/transportadoras': typeof TransportadorasRoute
+  '/usuarios': typeof UsuariosRoute
+  '/vendedor': typeof VendedorRoute
+  '/pedidos/$id': typeof PedidosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cidades': typeof CidadesRoute
+  '/clientes': typeof ClientesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/cotacao': typeof CotacaoRoute
+  '/historico': typeof HistoricoRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
+  '/pedidos': typeof PedidosRouteWithChildren
+  '/perfil': typeof PerfilRoute
+  '/portal': typeof PortalRoute
+  '/rastreamento': typeof RastreamentoRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/transportadoras': typeof TransportadorasRoute
+  '/usuarios': typeof UsuariosRoute
+  '/vendedor': typeof VendedorRoute
+  '/pedidos/$id': typeof PedidosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/cidades'
+    | '/clientes'
+    | '/configuracoes'
+    | '/cotacao'
+    | '/historico'
+    | '/login'
+    | '/notificacoes'
+    | '/pedidos'
+    | '/perfil'
+    | '/portal'
+    | '/rastreamento'
+    | '/relatorios'
+    | '/transportadoras'
+    | '/usuarios'
+    | '/vendedor'
+    | '/pedidos/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/cidades'
+    | '/clientes'
+    | '/configuracoes'
+    | '/cotacao'
+    | '/historico'
+    | '/login'
+    | '/notificacoes'
+    | '/pedidos'
+    | '/perfil'
+    | '/portal'
+    | '/rastreamento'
+    | '/relatorios'
+    | '/transportadoras'
+    | '/usuarios'
+    | '/vendedor'
+    | '/pedidos/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/cidades'
+    | '/clientes'
+    | '/configuracoes'
+    | '/cotacao'
+    | '/historico'
+    | '/login'
+    | '/notificacoes'
+    | '/pedidos'
+    | '/perfil'
+    | '/portal'
+    | '/rastreamento'
+    | '/relatorios'
+    | '/transportadoras'
+    | '/usuarios'
+    | '/vendedor'
+    | '/pedidos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CidadesRoute: typeof CidadesRoute
+  ClientesRoute: typeof ClientesRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  CotacaoRoute: typeof CotacaoRoute
+  HistoricoRoute: typeof HistoricoRoute
+  LoginRoute: typeof LoginRoute
+  NotificacoesRoute: typeof NotificacoesRoute
+  PedidosRoute: typeof PedidosRouteWithChildren
+  PerfilRoute: typeof PerfilRoute
+  PortalRoute: typeof PortalRoute
+  RastreamentoRoute: typeof RastreamentoRoute
+  RelatoriosRoute: typeof RelatoriosRoute
+  TransportadorasRoute: typeof TransportadorasRoute
+  UsuariosRoute: typeof UsuariosRoute
+  VendedorRoute: typeof VendedorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vendedor': {
+      id: '/vendedor'
+      path: '/vendedor'
+      fullPath: '/vendedor'
+      preLoaderRoute: typeof VendedorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transportadoras': {
+      id: '/transportadoras'
+      path: '/transportadoras'
+      fullPath: '/transportadoras'
+      preLoaderRoute: typeof TransportadorasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rastreamento': {
+      id: '/rastreamento'
+      path: '/rastreamento'
+      fullPath: '/rastreamento'
+      preLoaderRoute: typeof RastreamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedidos': {
+      id: '/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof PedidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico': {
+      id: '/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cotacao': {
+      id: '/cotacao'
+      path: '/cotacao'
+      fullPath: '/cotacao'
+      preLoaderRoute: typeof CotacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cidades': {
+      id: '/cidades'
+      path: '/cidades'
+      fullPath: '/cidades'
+      preLoaderRoute: typeof CidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +364,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pedidos/$id': {
+      id: '/pedidos/$id'
+      path: '/$id'
+      fullPath: '/pedidos/$id'
+      preLoaderRoute: typeof PedidosIdRouteImport
+      parentRoute: typeof PedidosRoute
+    }
   }
 }
 
+interface PedidosRouteChildren {
+  PedidosIdRoute: typeof PedidosIdRoute
+}
+
+const PedidosRouteChildren: PedidosRouteChildren = {
+  PedidosIdRoute: PedidosIdRoute,
+}
+
+const PedidosRouteWithChildren =
+  PedidosRoute._addFileChildren(PedidosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CidadesRoute: CidadesRoute,
+  ClientesRoute: ClientesRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  CotacaoRoute: CotacaoRoute,
+  HistoricoRoute: HistoricoRoute,
+  LoginRoute: LoginRoute,
+  NotificacoesRoute: NotificacoesRoute,
+  PedidosRoute: PedidosRouteWithChildren,
+  PerfilRoute: PerfilRoute,
+  PortalRoute: PortalRoute,
+  RastreamentoRoute: RastreamentoRoute,
+  RelatoriosRoute: RelatoriosRoute,
+  TransportadorasRoute: TransportadorasRoute,
+  UsuariosRoute: UsuariosRoute,
+  VendedorRoute: VendedorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
