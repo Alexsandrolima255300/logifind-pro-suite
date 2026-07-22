@@ -1,13 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MapPin, Scale, Box, Layers, DollarSign, Truck, Zap, Sparkles,
-  Ruler, Clock, TrendingDown, Trophy, CheckCircle2, AlertTriangle,
+  Ruler, Clock, TrendingDown, Trophy, CheckCircle2, AlertTriangle, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ESTADOS, CIDADES_POR_UF, BRL, type UF } from "@/lib/mock/data";
 import { quote, rank, calcVolume, isAprovado, limiteAprovacao } from "@/lib/freight-engine";
 
 const tiposCarga = ["Carga Seca", "Refrigerada", "Frágil", "Perigosa", "Eletrônicos", "Alimentos", "Química"];
+
+type CepData = { cep: string; uf: string; localidade: string; logradouro: string; bairro: string; erro?: boolean };
+
+async function fetchCep(cep: string): Promise<CepData | null> {
+  const clean = cep.replace(/\D/g, "");
+  if (clean.length !== 8) return null;
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
+    if (!r.ok) return null;
+    const data = (await r.json()) as CepData;
+    if (data.erro) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 
 export function QuoteEngine() {
   const [origemUf, setOrigemUf] = useState<UF>("SP");
