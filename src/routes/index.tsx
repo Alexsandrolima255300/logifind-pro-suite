@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
       { title: "Dashboard — LogiFinder TMS" },
       { name: "description", content: "Painel executivo LogiFinder: pedidos do dia, economia gerada, entregas em trânsito e performance por transportadora." },
       { property: "og:title", content: "Dashboard — LogiFinder TMS" },
-      { property: "og:description", content: "Visão completa da operação logística em tempo real." },
+      { property: "og:description", content: "Painel executivo LogiFinder: pedidos do dia, economia gerada, entregas em trânsito e performance por transportadora." },
     ],
   }),
   component: () => <AppLayout><Dashboard /></AppLayout>,

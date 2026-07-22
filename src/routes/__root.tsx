@@ -77,21 +77,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LogiFinder — Cotação Inteligente de Fretes" },
+      { title: "Dashboard — LogiFinder TMS" },
       {
         name: "description",
         content:
-          "Plataforma premium para cotação e gestão de fretes com as principais transportadoras do Brasil.",
+          "Painel executivo LogiFinder: pedidos do dia, economia gerada, entregas em trânsito e performance por transportadora.",
       },
       { name: "author", content: "LogiFinder" },
-      { property: "og:title", content: "LogiFinder — Cotação Inteligente de Fretes" },
+      { property: "og:title", content: "Dashboard — LogiFinder TMS" },
       {
         property: "og:description",
         content:
-          "Compare cotações das principais transportadoras do Brasil em uma única plataforma profissional.",
+          "Painel executivo LogiFinder: pedidos do dia, economia gerada, entregas em trânsito e performance por transportadora.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Dashboard — LogiFinder TMS" },
+      { name: "twitter:description", content: "Painel executivo LogiFinder: pedidos do dia, economia gerada, entregas em trânsito e performance por transportadora." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eae00810-e7e6-41c6-a4cf-1e41e94bef9b/id-preview-7d3cb578--50516af8-e796-4e2f-a7f4-a8c43bbaf9c6.lovable.app-1784718444874.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eae00810-e7e6-41c6-a4cf-1e41e94bef9b/id-preview-7d3cb578--50516af8-e796-4e2f-a7f4-a8c43bbaf9c6.lovable.app-1784718444874.png" },
     ],
     links: [
       {
