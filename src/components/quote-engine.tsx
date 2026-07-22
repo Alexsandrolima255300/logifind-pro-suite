@@ -212,13 +212,42 @@ export function QuoteEngine() {
 }
 
 function RouteBlock({
-  title, uf, cidade, onUf, onCidade, accent, cep, onCep,
+  title, uf, cidade, onUf, onCidade, accent, cep, onCep, rua, onRua, setUf,
 }: {
   title: string; uf: UF; cidade: string;
   onUf: (u: UF) => void; onCidade: (c: string) => void; accent: string;
-  cep?: string; onCep?: (v: string) => void;
+  cep: string; onCep: (v: string) => void;
+  rua: string; onRua: (v: string) => void;
+  setUf: (u: UF) => void;
 }) {
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const lastLookup = useRef("");
+
   const cidades = CIDADES_POR_UF[uf] ?? [];
+  const cidadesOptions = cidades.includes(cidade) || !cidade ? cidades : [cidade, ...cidades];
+
+  function formatCep(v: string) {
+    const d = v.replace(/\D/g, "").slice(0, 8);
+    return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+  }
+
+  useEffect(() => {
+    const clean = cep.replace(/\D/g, "");
+    if (clean.length !== 8) { setNotFound(false); return; }
+    if (lastLookup.current === clean) return;
+    lastLookup.current = clean;
+    setLoading(true);
+    setNotFound(false);
+    fetchCep(clean).then((data) => {
+      setLoading(false);
+      if (!data) { setNotFound(true); return; }
+      setUf(data.uf as UF);
+      onCidade(data.localidade);
+      onRua([data.logradouro, data.bairro].filter(Boolean).join(" — "));
+    });
+  }, [cep, setUf, onCidade, onRua]);
+
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 md:p-5">
       <div className="flex items-center gap-2 mb-4">
@@ -227,12 +256,28 @@ function RouteBlock({
         </div>
         <div className="text-[11px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">{title}</div>
       </div>
+
+      <div className="mb-3">
+        <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">CEP</label>
+        <div className="relative">
+          <input
+            value={cep}
+            onChange={(e) => onCep(formatCep(e.target.value))}
+            placeholder="00000-000"
+            inputMode="numeric"
+            className="w-full h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 pr-10 text-sm font-medium focus:outline-none focus:border-primary/50"
+          />
+          {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />}
+        </div>
+        {notFound && <div className="mt-1 text-[10px] text-yellow-400">CEP não encontrado</div>}
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-2">
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Cidade</label>
           <select value={cidade} onChange={(e) => onCidade(e.target.value)}
             className="w-full h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 text-sm font-medium focus:outline-none focus:border-primary/50 appearance-none cursor-pointer">
-            {cidades.map((c) => <option key={c} value={c} className="bg-neutral-900">{c}</option>)}
+            {cidadesOptions.map((c) => <option key={c} value={c} className="bg-neutral-900">{c}</option>)}
           </select>
         </div>
         <div>
@@ -243,16 +288,16 @@ function RouteBlock({
           </select>
         </div>
       </div>
-      {onCep && (
-        <div className="mt-3">
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">CEP</label>
-          <input value={cep ?? ""} onChange={(e) => onCep(e.target.value)} placeholder="00000-000"
-            className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 text-sm font-medium focus:outline-none focus:border-primary/50" />
-        </div>
-      )}
+
+      <div className="mt-3">
+        <label className="text-[10px] uppercase tracking-wider text-muted-foreground block mb-1">Rua / Bairro</label>
+        <input value={rua} onChange={(e) => onRua(e.target.value)} placeholder="Preenchido automaticamente pelo CEP"
+          className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 text-sm font-medium focus:outline-none focus:border-primary/50" />
+      </div>
     </div>
   );
 }
+
 
 function Divider({ children }: { children: React.ReactNode }) {
   return (
