@@ -29,9 +29,12 @@ async function fetchCep(cep: string): Promise<CepData | null> {
 export function QuoteEngine() {
   const [origemUf, setOrigemUf] = useState<UF>("SP");
   const [origemCidade, setOrigemCidade] = useState("São Paulo");
+  const [origemCep, setOrigemCep] = useState("");
+  const [origemRua, setOrigemRua] = useState("");
   const [destinoUf, setDestinoUf] = useState<UF>("PR");
   const [destinoCidade, setDestinoCidade] = useState("Curitiba");
-  const [cep, setCep] = useState("80010-000");
+  const [destinoCep, setDestinoCep] = useState("");
+  const [destinoRua, setDestinoRua] = useState("");
   const [pesoReal, setPesoReal] = useState("450");
   const [altura, setAltura] = useState("80");
   const [largura, setLargura] = useState("100");
