@@ -81,12 +81,17 @@ export function QuoteEngine() {
             title="Origem" uf={origemUf} cidade={origemCidade}
             onUf={(u) => { setOrigemUf(u); setOrigemCidade(CIDADES_POR_UF[u]?.[0] ?? ""); }}
             onCidade={setOrigemCidade} accent="from-primary to-emerald-600"
+            cep={origemCep} onCep={setOrigemCep}
+            rua={origemRua} onRua={setOrigemRua}
+            setUf={setOrigemUf}
           />
           <RouteBlock
             title="Destino" uf={destinoUf} cidade={destinoCidade}
             onUf={(u) => { setDestinoUf(u); setDestinoCidade(CIDADES_POR_UF[u]?.[0] ?? ""); }}
             onCidade={setDestinoCidade} accent="from-cyan-400 to-teal-600"
-            cep={cep} onCep={setCep}
+            cep={destinoCep} onCep={setDestinoCep}
+            rua={destinoRua} onRua={setDestinoRua}
+            setUf={setDestinoUf}
           />
         </div>
 
