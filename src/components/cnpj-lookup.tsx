@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Building2, Loader2, CheckCircle2, AlertTriangle, WifiOff } from "lucide-react";
+import { Building2, Loader2, CheckCircle2, AlertTriangle, WifiOff, Send, PackageCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCnpj, isValidCnpj, fetchCnpj, type CnpjCompany } from "@/lib/cnpj";
 
@@ -10,13 +10,18 @@ const EMPTY: CnpjCompany = {
 };
 
 type Status = "idle" | "loading" | "ok" | "not_found" | "unavailable";
+type Role = "remetente" | "destinatario";
 
-export function CnpjLookup({
+export function CompanyBlock({
+  role,
+  defaultCnpj = "",
   onCompanyChange,
 }: {
+  role: Role;
+  defaultCnpj?: string;
   onCompanyChange?: (c: CnpjCompany) => void;
 }) {
-  const [cnpj, setCnpj] = useState("");
+  const [cnpj, setCnpj] = useState(defaultCnpj ? formatCnpj(defaultCnpj) : "");
   const [company, setCompany] = useState<CnpjCompany>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const lastLookup = useRef("");
@@ -25,15 +30,8 @@ export function CnpjLookup({
   const valid = isValidCnpj(clean);
 
   useEffect(() => {
-    if (clean.length !== 14) {
-      setStatus("idle");
-      lastLookup.current = "";
-      return;
-    }
-    if (!valid) {
-      setStatus("idle");
-      return;
-    }
+    if (clean.length !== 14) { setStatus("idle"); lastLookup.current = ""; return; }
+    if (!valid) { setStatus("idle"); return; }
     if (lastLookup.current === clean) return;
     lastLookup.current = clean;
     setStatus("loading");
@@ -58,15 +56,22 @@ export function CnpjLookup({
   }
 
   const showFields = status === "ok" || status === "not_found" || status === "unavailable";
+  const isRem = role === "remetente";
+  const Icon = isRem ? Send : PackageCheck;
+  const title = isRem ? "Remetente" : "Destinatário";
+  const accent = isRem ? "from-primary to-emerald-600" : "from-cyan-400 to-teal-600";
 
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 md:p-5">
       <div className="flex items-center gap-2 mb-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-emerald-600">
-          <Building2 className="h-4 w-4 text-black" strokeWidth={2.5} />
+        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br", accent)}>
+          <Icon className="h-4 w-4 text-black" strokeWidth={2.5} />
         </div>
         <div className="text-[11px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">
-          Dados da Empresa
+          {title}
+        </div>
+        <div className="ml-auto flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+          <Building2 className="h-3 w-3" /> CNPJ
         </div>
       </div>
 
@@ -86,12 +91,8 @@ export function CnpjLookup({
                   : "border-white/[0.08] focus:border-primary/50",
               )}
             />
-            {status === "loading" && (
-              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
-            )}
-            {status === "ok" && (
-              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
-            )}
+            {status === "loading" && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />}
+            {status === "ok" && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />}
           </div>
           <StatusHint status={status} invalid={clean.length === 14 && !valid} />
         </div>
@@ -100,16 +101,13 @@ export function CnpjLookup({
           <>
             <F label="Razão Social" value={company.razaoSocial} onChange={(v) => update("razaoSocial", v)} className="md:col-span-2" />
             <F label="Nome Fantasia" value={company.nomeFantasia} onChange={(v) => update("nomeFantasia", v)} className="md:col-span-2" />
-            <F label="Situação Cadastral" value={company.situacao} onChange={(v) => update("situacao", v)} />
-            <F label="Data de Abertura" value={company.dataAbertura} onChange={(v) => update("dataAbertura", v)} type="date" />
-            <F label="Natureza Jurídica" value={company.naturezaJuridica} onChange={(v) => update("naturezaJuridica", v)} className="md:col-span-2" />
             <F label="CEP" value={company.cep} onChange={(v) => update("cep", v)} />
             <F label="Logradouro" value={company.logradouro} onChange={(v) => update("logradouro", v)} className="md:col-span-2" />
             <F label="Número" value={company.numero} onChange={(v) => update("numero", v)} />
             <F label="Complemento" value={company.complemento} onChange={(v) => update("complemento", v)} />
             <F label="Bairro" value={company.bairro} onChange={(v) => update("bairro", v)} />
             <F label="Cidade" value={company.cidade} onChange={(v) => update("cidade", v)} className="md:col-span-2" />
-            <F label="Estado" value={company.uf} onChange={(v) => update("uf", v.toUpperCase().slice(0, 2))} />
+            <F label="UF" value={company.uf} onChange={(v) => update("uf", v.toUpperCase().slice(0, 2))} />
           </>
         )}
       </div>
@@ -118,35 +116,19 @@ export function CnpjLookup({
 }
 
 function StatusHint({ status, invalid }: { status: Status; invalid: boolean }) {
-  if (invalid) {
-    return (
-      <div className="mt-1 flex items-center gap-1 text-[10px] text-yellow-400">
-        <AlertTriangle className="h-3 w-3" /> CNPJ inválido
-      </div>
-    );
-  }
-  if (status === "ok") {
-    return (
-      <div className="mt-1 flex items-center gap-1 text-[10px] text-primary">
-        <CheckCircle2 className="h-3 w-3" /> Dados encontrados e preenchidos automaticamente
-      </div>
-    );
-  }
-  if (status === "not_found") {
-    return (
-      <div className="mt-1 flex items-center gap-1 text-[10px] text-yellow-400">
-        <AlertTriangle className="h-3 w-3" /> CNPJ não localizado — preencha manualmente
-      </div>
-    );
-  }
-  if (status === "unavailable") {
-    return (
-      <div className="mt-1 flex items-center gap-1 text-[10px] text-yellow-400">
-        <WifiOff className="h-3 w-3" /> Serviço indisponível — preencha manualmente
-      </div>
-    );
-  }
+  if (invalid) return <Hint tone="warn" icon={AlertTriangle} text="CNPJ inválido" />;
+  if (status === "ok") return <Hint tone="ok" icon={CheckCircle2} text="Dados preenchidos automaticamente" />;
+  if (status === "not_found") return <Hint tone="warn" icon={AlertTriangle} text="CNPJ não localizado — preencha manualmente" />;
+  if (status === "unavailable") return <Hint tone="warn" icon={WifiOff} text="Serviço indisponível — preencha manualmente" />;
   return null;
+}
+
+function Hint({ tone, icon: Icon, text }: { tone: "ok" | "warn"; icon: React.ComponentType<{ className?: string }>; text: string }) {
+  return (
+    <div className={cn("mt-1 flex items-center gap-1 text-[10px]", tone === "ok" ? "text-primary" : "text-yellow-400")}>
+      <Icon className="h-3 w-3" /> {text}
+    </div>
+  );
 }
 
 function F({
@@ -166,3 +148,8 @@ function F({
     </div>
   );
 }
+
+// Backward-compat alias (legacy import name)
+export const CnpjLookup = (props: { onCompanyChange?: (c: CnpjCompany) => void }) => (
+  <CompanyBlock role="destinatario" {...props} />
+);
