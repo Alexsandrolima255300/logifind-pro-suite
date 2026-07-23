@@ -6,6 +6,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ESTADOS, CIDADES_POR_UF, BRL, type UF } from "@/lib/mock/data";
 import { quote, rank, calcVolume, isAprovado, limiteAprovacao } from "@/lib/freight-engine";
+import { CnpjLookup } from "@/components/cnpj-lookup";
 
 const tiposCarga = ["Carga Seca", "Refrigerada", "Frágil", "Perigosa", "Eletrônicos", "Alimentos", "Química"];
 
@@ -76,6 +77,10 @@ export function QuoteEngine() {
       </div>
 
       <div className="glass-strong rounded-3xl p-5 md:p-8 shadow-[0_40px_100px_-40px_oklch(0_0_0/0.8)]">
+        <CnpjLookup />
+
+        <Divider>Rota</Divider>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <RouteBlock
             title="Origem" uf={origemUf} cidade={origemCidade}
