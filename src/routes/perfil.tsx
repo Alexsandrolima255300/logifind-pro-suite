@@ -21,18 +21,18 @@ function Perfil() {
       <div className="mx-auto max-w-[900px] p-4 md:p-8 space-y-6">
         <PageHeader eyebrow="Conta" title="Meu Perfil" description="Suas informações pessoais e credenciais." />
         <div className="glass rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
-          <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-primary to-emerald-700 flex items-center justify-center text-3xl font-bold text-black shadow-[0_20px_60px_-15px_oklch(0.74_0.18_152/0.8)]">
-            MC
+          <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-primary to-emerald-700 flex items-center justify-center text-2xl font-bold text-black shadow-[0_20px_60px_-15px_oklch(0.74_0.18_152/0.8)]">
+            BEC
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-2xl font-bold">Marcos Costa</div>
+            <div className="text-2xl font-bold">BRASIL ENGRENAGENS E CORRENTES</div>
             <div className="text-sm text-muted-foreground">Administrador · Gestor de Logística</div>
             <div className="mt-3 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
                 <Shield className="h-3 w-3" /> Administrador
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-muted-foreground">
-                Empresa Aurora Log
+                BRASIL ENGRENAGENS E CORRENTES
               </span>
             </div>
           </div>
