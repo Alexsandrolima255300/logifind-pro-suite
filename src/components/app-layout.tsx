@@ -105,11 +105,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
         <div className="border-t border-white/[0.05] p-3 space-y-2 shrink-0">
           <div className={cn("flex items-center gap-3 rounded-xl px-2 py-2", collapsed && "md:justify-center")}>
-            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-emerald-500/40 to-emerald-800/40 border border-white/10 flex items-center justify-center text-xs font-bold">
-              MC
+            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-emerald-500/40 to-emerald-800/40 border border-white/10 flex items-center justify-center text-[10px] font-bold">
+              BEC
             </div>
             <div className={cn("min-w-0 flex-1", collapsed && "md:hidden")}>
-              <div className="text-xs font-semibold truncate">Marcos Costa</div>
+              <div className="text-xs font-semibold truncate">BRASIL ENGRENAGENS E CORRENTES</div>
               <div className="text-[10px] text-muted-foreground truncate">Administrador</div>
             </div>
             <Link to="/login" className={cn("text-muted-foreground hover:text-foreground transition", collapsed && "md:hidden")}>
