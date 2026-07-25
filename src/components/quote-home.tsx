@@ -14,6 +14,9 @@ import {
   TrendingDown,
   Percent,
   Sparkles,
+  Plus,
+  Trash2,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +39,61 @@ const cidadesPorEstado: Record<string, string[]> = {
   MT: ["Cuiabá"],
   MS: ["Campo Grande"],
 };
+
+// Tipos de volume pré-definidos
+const tiposVolumePreset = [
+  {
+    id: "caixa-p",
+    label: "Caixa P",
+    desc: "10×40×40 cm",
+    icon: "📦",
+    altura: 10,
+    largura: 40,
+    comprimento: 40,
+  },
+  {
+    id: "caixa-m",
+    label: "Caixa M",
+    desc: "10×20×20 cm",
+    icon: "📦",
+    altura: 10,
+    largura: 20,
+    comprimento: 20,
+  },
+  {
+    id: "pallet",
+    label: "Pallet",
+    desc: "70×70×70 cm",
+    icon: "🟫",
+    altura: 70,
+    largura: 70,
+    comprimento: 70,
+  },
+  {
+    id: "caixote",
+    label: "Caixote",
+    desc: "70×70×100 cm",
+    icon: "📫",
+    altura: 70,
+    largura: 70,
+    comprimento: 100,
+  },
+];
+
+type VolumeItem = {
+  id: string;
+  tipo: string;
+  quantidade: number;
+  altura: number;
+  largura: number;
+  comprimento: number;
+  peso: number;
+};
+
+function calcPesoCubado(h: number, l: number, c: number): number {
+  // Fator de cubagem padrão: 300 kg/m³ (padrão rodoviário)
+  return (h * l * c) / 6000;
+}
 
 type Quote = {
   transportadora: string;
@@ -72,27 +130,91 @@ function calcQuote(input: {
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+let nextId = 1;
+
 export function QuoteHome() {
   const [origemEstado, setOrigemEstado] = useState("SP");
   const [origemCidade, setOrigemCidade] = useState("São Paulo");
   const [destinoEstado, setDestinoEstado] = useState("PR");
   const [destinoCidade, setDestinoCidade] = useState("Curitiba");
-  const [pesoBruto, setPesoBruto] = useState("450");
-  const [pesoCubado, setPesoCubado] = useState("380");
-  const [volumes, setVolumes] = useState("12");
   const [valorNF, setValorNF] = useState("38000");
   const [tipoCarga, setTipoCarga] = useState("Carga Seca");
+
+  // Lista de volumes
+  const [volumeItems, setVolumeItems] = useState<VolumeItem[]>([
+    {
+      id: String(nextId++),
+      tipo: "caixa-p",
+      quantidade: 12,
+      altura: 10,
+      largura: 40,
+      comprimento: 40,
+      peso: 450,
+    },
+  ]);
+
+  // Totais calculados automaticamente
+  const totais = useMemo(() => {
+    const totalVolumes = volumeItems.reduce((s, v) => s + v.quantidade, 0);
+    const totalPesoBruto = volumeItems.reduce((s, v) => s + v.peso * v.quantidade, 0);
+    const totalPesoCubado = volumeItems.reduce(
+      (s, v) => s + calcPesoCubado(v.altura, v.largura, v.comprimento) * v.quantidade,
+      0,
+    );
+    return { totalVolumes, totalPesoBruto, totalPesoCubado };
+  }, [volumeItems]);
 
   const quote = useMemo(
     () =>
       calcQuote({
-        pesoBruto: parseFloat(pesoBruto) || 0,
-        pesoCubado: parseFloat(pesoCubado) || 0,
-        volumes: parseInt(volumes) || 0,
+        pesoBruto: totais.totalPesoBruto,
+        pesoCubado: totais.totalPesoCubado,
+        volumes: totais.totalVolumes,
         valorNF: parseFloat(valorNF) || 0,
       }),
-    [pesoBruto, pesoCubado, volumes, valorNF],
+    [totais, valorNF],
   );
+
+  function addVolume(presetId?: string) {
+    const preset = tiposVolumePreset.find((p) => p.id === presetId) ?? tiposVolumePreset[0];
+    setVolumeItems((prev) => [
+      ...prev,
+      {
+        id: String(nextId++),
+        tipo: preset.id,
+        quantidade: 1,
+        altura: preset.altura,
+        largura: preset.largura,
+        comprimento: preset.comprimento,
+        peso: 10,
+      },
+    ]);
+  }
+
+  function removeVolume(id: string) {
+    setVolumeItems((prev) => prev.filter((v) => v.id !== id));
+  }
+
+  function updateVolume(id: string, field: keyof VolumeItem, value: number | string) {
+    setVolumeItems((prev) =>
+      prev.map((v) => {
+        if (v.id !== id) return v;
+        if (field === "tipo") {
+          const preset = tiposVolumePreset.find((p) => p.id === value);
+          if (preset)
+            return {
+              ...v,
+              tipo: preset.id,
+              altura: preset.altura,
+              largura: preset.largura,
+              comprimento: preset.comprimento,
+            };
+          return { ...v, tipo: String(value) };
+        }
+        return { ...v, [field]: typeof value === "string" ? parseFloat(value) || 0 : value };
+      }),
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1280px] p-4 md:p-8 space-y-6 md:space-y-8">
@@ -103,7 +225,7 @@ export function QuoteHome() {
           Cotação em tempo real
         </div>
         <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight">
-          Encontre o <span className="text-gradient-green">melhor frete</span> em segundos
+          Encontre o <span className="text-gradient-blue">melhor frete</span> em segundos
         </h1>
         <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
           Preencha os dados da carga e compare cotações das principais transportadoras do Brasil.
@@ -123,7 +245,7 @@ export function QuoteHome() {
               setOrigemCidade(cidadesPorEstado[e]?.[0] ?? "");
             }}
             onCidadeChange={setOrigemCidade}
-            accent="from-primary to-emerald-600"
+            accent="from-primary to-blue-600"
           />
           <RouteBlock
             title="Destino"
@@ -138,38 +260,171 @@ export function QuoteHome() {
           />
         </div>
 
+        {/* Divisor */}
         <div className="my-6 md:my-8 flex items-center gap-4">
           <div className="h-px flex-1 bg-white/[0.06]" />
-          <span className="text-[10px] uppercase tracking-[0.24em] text-muted-foreground">Dados da Carga</span>
+          <span className="text-[10px] uppercase tracking-[0.24em] text-muted-foreground">Volumes e Dimensões</span>
           <div className="h-px flex-1 bg-white/[0.06]" />
         </div>
 
-        {/* Carga */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          <Field
-            icon={Scale}
-            label="Peso Bruto"
-            value={pesoBruto}
-            onChange={setPesoBruto}
-            suffix="kg"
-            type="number"
+        {/* Tipos de Volume - Atalhos */}
+        <div className="mb-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5">
+            <PackageIcon className="h-3 w-3" /> Adicionar volume pré-definido
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {tiposVolumePreset.map((preset) => (
+              <button
+                key={preset.id}
+                onClick={() => addVolume(preset.id)}
+                className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-white/[0.06] hover:border-primary/30 transition-all duration-200"
+              >
+                <span className="text-base leading-none">{preset.icon}</span>
+                <span className="font-semibold">{preset.label}</span>
+                <span className="text-muted-foreground/60">{preset.desc}</span>
+                <Plus className="h-3 w-3 text-primary ml-1" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista de volumes */}
+        <div className="space-y-3">
+          {volumeItems.map((vol, idx) => {
+            const pesoTotal = vol.peso * vol.quantidade;
+            const cubado = calcPesoCubado(vol.altura, vol.largura, vol.comprimento) * vol.quantidade;
+            return (
+              <div
+                key={vol.id}
+                className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 animate-in fade-in slide-in-from-top-2 duration-300"
+              >
+                {/* Header da linha */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/15 text-[11px] font-bold text-primary">
+                      {idx + 1}
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Volume</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] text-muted-foreground">
+                      Cubado: <span className="text-foreground font-semibold">{cubado.toFixed(2)} kg</span>
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      Peso total: <span className="text-foreground font-semibold">{pesoTotal.toFixed(1)} kg</span>
+                    </span>
+                    {volumeItems.length > 1 && (
+                      <button
+                        onClick={() => removeVolume(vol.id)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-rose-400/70 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Campos */}
+                <div className="grid grid-cols-2 md:grid-cols-7 gap-2 md:gap-3">
+                  {/* Tipo */}
+                  <div className="col-span-2 md:col-span-2">
+                    <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1">
+                      Tipo
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={vol.tipo}
+                        onChange={(e) => updateVolume(vol.id, "tipo", e.target.value)}
+                        className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 text-sm font-medium focus:outline-none focus:border-primary/50 transition appearance-none cursor-pointer"
+                      >
+                        {tiposVolumePreset.map((p) => (
+                          <option key={p.id} value={p.id} className="bg-neutral-900">
+                            {p.icon} {p.label} — {p.desc}
+                          </option>
+                        ))}
+                        <option value="personalizado" className="bg-neutral-900">
+                          ✏️ Personalizado
+                        </option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </div>
+
+                  {/* Quantidade */}
+                  <DimField
+                    label="Qtd"
+                    value={vol.quantidade}
+                    onChange={(v) => updateVolume(vol.id, "quantidade", v)}
+                    suffix="un"
+                  />
+
+                  {/* Altura */}
+                  <DimField
+                    label="Altura"
+                    value={vol.altura}
+                    onChange={(v) => updateVolume(vol.id, "altura", v)}
+                    suffix="cm"
+                  />
+
+                  {/* Largura */}
+                  <DimField
+                    label="Largura"
+                    value={vol.largura}
+                    onChange={(v) => updateVolume(vol.id, "largura", v)}
+                    suffix="cm"
+                  />
+
+                  {/* Comprimento */}
+                  <DimField
+                    label="Compr."
+                    value={vol.comprimento}
+                    onChange={(v) => updateVolume(vol.id, "comprimento", v)}
+                    suffix="cm"
+                  />
+
+                  {/* Peso unitário */}
+                  <DimField
+                    label="Peso/un"
+                    value={vol.peso}
+                    onChange={(v) => updateVolume(vol.id, "peso", v)}
+                    suffix="kg"
+                  />
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Botão adicionar volume personalizado */}
+          <button
+            onClick={() => addVolume()}
+            className="w-full flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/[0.1] py-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-white/[0.02] transition-all duration-200"
+          >
+            <Plus className="h-4 w-4" />
+            Adicionar outro volume
+          </button>
+        </div>
+
+        {/* Totais calculados */}
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          <TotalCard label="Total de Volumes" value={`${totais.totalVolumes} un`} icon="📦" />
+          <TotalCard label="Peso Bruto Total" value={`${totais.totalPesoBruto.toFixed(1)} kg`} icon="⚖️" />
+          <TotalCard
+            label="Peso Cubado Total"
+            value={`${totais.totalPesoCubado.toFixed(2)} kg`}
+            icon="📐"
+            highlight={totais.totalPesoCubado > totais.totalPesoBruto}
           />
-          <Field
-            icon={Box}
-            label="Peso Cubado"
-            value={pesoCubado}
-            onChange={setPesoCubado}
-            suffix="kg"
-            type="number"
-          />
-          <Field
-            icon={Layers}
-            label="Volumes"
-            value={volumes}
-            onChange={setVolumes}
-            suffix="un"
-            type="number"
-          />
+        </div>
+
+        {/* Divisor */}
+        <div className="my-6 flex items-center gap-4">
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <span className="text-[10px] uppercase tracking-[0.24em] text-muted-foreground">Dados Fiscais</span>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+        </div>
+
+        {/* Valor NF */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <Field
             icon={DollarSign}
             label="Valor da NF-e"
@@ -178,33 +433,30 @@ export function QuoteHome() {
             prefix="R$"
             type="number"
           />
-        </div>
-
-        <div className="mt-4 md:mt-5">
-          <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1.5 mb-2">
-            <PackageIcon className="h-3 w-3" /> Tipo de Carga
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {tiposCarga.map((t) => (
-              <button
-                key={t}
-                onClick={() => setTipoCarga(t)}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all duration-300",
-                  tipoCarga === t
-                    ? "border-primary/40 bg-primary/15 text-primary shadow-[0_0_20px_-6px_oklch(0.74_0.18_152/0.6)]"
-                    : "border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-foreground hover:border-white/20",
-                )}
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-1.5">
+              <PackageIcon className="h-3 w-3" /> Tipo de Carga
+            </label>
+            <div className="relative">
+              <select
+                value={tipoCarga}
+                onChange={(e) => setTipoCarga(e.target.value)}
+                className="w-full h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] px-3 text-sm font-medium focus:outline-none focus:border-primary/50 transition appearance-none cursor-pointer"
               >
-                {t}
-              </button>
-            ))}
+                {tiposCarga.map((t) => (
+                  <option key={t} value={t} className="bg-neutral-900">
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            </div>
           </div>
         </div>
 
         {/* CTA */}
-        <button className="group mt-6 md:mt-8 relative w-full flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-br from-primary via-emerald-500 to-emerald-600 py-4 md:py-5 text-base md:text-lg font-bold tracking-tight text-black shadow-[0_20px_60px_-20px_oklch(0.74_0.18_152/0.8)] hover:shadow-[0_28px_80px_-20px_oklch(0.74_0.18_152/1)] hover:brightness-110 transition-all duration-300 overflow-hidden">
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+        <button className="group mt-6 md:mt-8 relative w-full flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-br from-primary via-blue-500 to-indigo-600 py-4 md:py-5 text-base md:text-lg font-bold tracking-tight text-white shadow-[0_20px_60px_-20px_oklch(0.62_0.22_255/0.8)] hover:shadow-[0_28px_80px_-20px_oklch(0.62_0.22_255/1)] hover:brightness-110 transition-all duration-300 overflow-hidden">
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           <Zap className="h-5 w-5" strokeWidth={2.5} />
           COTAR FRETE
         </button>
@@ -217,16 +469,14 @@ export function QuoteHome() {
             {/* Result header */}
             <div className="p-5 md:p-6 border-b border-white/[0.05] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-emerald-700 shadow-[0_0_30px_-8px_oklch(0.74_0.18_152/0.7)]">
-                  <Truck className="h-7 w-7 text-black" strokeWidth={2.5} />
+                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-indigo-700 shadow-[0_0_30px_-8px_oklch(0.62_0.22_255/0.7)]">
+                  <Truck className="h-7 w-7 text-white" strokeWidth={2.5} />
                 </div>
                 <div className="min-w-0">
                   <div className="text-[11px] uppercase tracking-[0.2em] text-primary/80 font-semibold">
                     Melhor Transportadora
                   </div>
-                  <div className="text-xl md:text-2xl font-bold tracking-tight truncate">
-                    {quote.transportadora}
-                  </div>
+                  <div className="text-xl md:text-2xl font-bold tracking-tight truncate">{quote.transportadora}</div>
                 </div>
               </div>
               <StatusBadge aprovado={quote.aprovado} />
@@ -235,19 +485,8 @@ export function QuoteHome() {
             {/* Result metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-white/[0.05]">
               <Metric icon={Clock} label="Prazo" value={`${quote.prazo} dias`} sub="úteis" />
-              <Metric
-                icon={DollarSign}
-                label="Valor do Frete"
-                value={brl(quote.valor)}
-                sub="total"
-                highlight
-              />
-              <Metric
-                icon={TrendingDown}
-                label="Custo por Kg"
-                value={brl(quote.custoKg)}
-                sub="peso taxado"
-              />
+              <Metric icon={DollarSign} label="Valor do Frete" value={brl(quote.valor)} sub="total" highlight />
+              <Metric icon={TrendingDown} label="Custo por Kg" value={brl(quote.custoKg)} sub="peso taxado" />
               <Metric
                 icon={Percent}
                 label="% sobre NF-e"
@@ -266,6 +505,70 @@ export function QuoteHome() {
             Atualizado em tempo real · consultando 12 transportadoras
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Sub-componentes ────────────────────────────────────────────────────────
+
+function DimField({
+  label,
+  value,
+  onChange,
+  suffix,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  suffix: string;
+}) {
+  return (
+    <div>
+      <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1">{label}</label>
+      <div className="relative">
+        <input
+          type="number"
+          min={0}
+          value={value}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] pl-3 pr-9 text-sm font-semibold focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition"
+        />
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-muted-foreground pointer-events-none">
+          {suffix}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TotalCard({
+  label,
+  value,
+  icon,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  icon: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border p-3 md:p-4 text-center transition-all duration-300",
+        highlight
+          ? "border-primary/30 bg-primary/10 shadow-[0_0_20px_-8px_oklch(0.62_0.22_255/0.4)]"
+          : "border-white/[0.06] bg-white/[0.02]",
+      )}
+    >
+      <div className="text-lg mb-1">{icon}</div>
+      <div className={cn("text-base md:text-lg font-bold tracking-tight", highlight && "text-gradient-blue")}>
+        {value}
+      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</div>
+      {highlight && (
+        <div className="mt-1 text-[10px] text-primary/70 font-medium">⚠️ Peso taxado será o cubado</div>
       )}
     </div>
   );
@@ -296,17 +599,13 @@ function RouteBlock({
             accent,
           )}
         >
-          <MapPin className="h-4 w-4 text-black" strokeWidth={2.5} />
+          <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
         </div>
-        <div className="text-[11px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">
-          {title}
-        </div>
+        <div className="text-[11px] uppercase tracking-[0.24em] font-semibold text-muted-foreground">{title}</div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1.5">
-            Cidade
-          </label>
+          <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1.5">Cidade</label>
           <select
             value={cidade}
             onChange={(e) => onCidadeChange(e.target.value)}
@@ -320,9 +619,7 @@ function RouteBlock({
           </select>
         </div>
         <div>
-          <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1.5">
-            UF
-          </label>
+          <label className="text-[10px] uppercase tracking-wider text-muted-foreground/80 block mb-1.5">UF</label>
           <select
             value={estado}
             onChange={(e) => onEstadoChange(e.target.value)}
@@ -406,9 +703,7 @@ function Metric({
 }) {
   return (
     <div className="p-5 md:p-6 relative overflow-hidden">
-      {highlight && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 to-transparent pointer-events-none" />
-      )}
+      {highlight && <div className="absolute inset-0 bg-gradient-to-br from-primary/8 to-transparent pointer-events-none" />}
       <div className="relative">
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
           <Icon className="h-3.5 w-3.5" strokeWidth={2} />
@@ -417,7 +712,7 @@ function Metric({
         <div
           className={cn(
             "text-xl md:text-2xl font-bold tracking-tight",
-            highlight && "text-gradient-green",
+            highlight && "text-gradient-blue",
             warn && "text-yellow-400",
           )}
         >
@@ -435,7 +730,7 @@ function StatusBadge({ aprovado }: { aprovado: boolean }) {
       className={cn(
         "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold shadow-lg",
         aprovado
-          ? "border-primary/30 bg-primary/10 text-primary shadow-[0_0_24px_-8px_oklch(0.74_0.18_152/0.6)]"
+          ? "border-primary/30 bg-primary/10 text-primary shadow-[0_0_24px_-8px_oklch(0.62_0.22_255/0.6)]"
           : "border-yellow-500/30 bg-yellow-500/10 text-yellow-400 shadow-[0_0_24px_-8px_oklch(0.8_0.16_85/0.5)]",
       )}
     >
