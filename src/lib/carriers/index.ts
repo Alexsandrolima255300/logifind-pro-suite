@@ -2,8 +2,10 @@ import type { CarrierAdapter, CarrierQuoteResult, FreightRequest } from "./types
 import { rodonavesAdapter } from "./adapters/rodonaves";
 import { braspressAdapter } from "./adapters/braspress";
 import { alfaAdapter } from "./adapters/alfa";
+import { danubioAdapter } from "./adapters/danubio";
 
 export const ADAPTERS: CarrierAdapter[] = [
+  danubioAdapter,
   rodonavesAdapter,
   braspressAdapter,
   alfaAdapter,
