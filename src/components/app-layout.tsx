@@ -103,78 +103,49 @@ export function AppLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div className="border-t border-white/[0.05] p-3 space-y-2 shrink-0">
-          <div className={cn("flex items-center gap-3 rounded-xl px-2 py-2", collapsed && "md:justify-center")}>
-            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-emerald-500/40 to-emerald-800/40 border border-white/10 flex items-center justify-center text-[10px] font-bold">
-              BEC
-            </div>
-            <div className={cn("min-w-0 flex-1", collapsed && "md:hidden")}>
-              <div className="text-xs font-semibold truncate">BRASIL ENGRENAGENS E CORRENTES</div>
-              <div className="text-[10px] text-muted-foreground truncate">Administrador</div>
-            </div>
-            <Link to="/login" className={cn("text-muted-foreground hover:text-foreground transition", collapsed && "md:hidden")}>
-              <LogOut className="h-4 w-4" />
-            </Link>
-          </div>
+        <div className="p-3 border-t border-white/[0.05] shrink-0 flex items-center justify-between">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs text-muted-foreground hover:bg-white/[0.04] hover:text-foreground transition"
+            className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-white/[0.05] hover:text-foreground transition-colors"
           >
-            <ChevronLeft className={cn("h-4 w-4 transition-transform duration-500", collapsed && "rotate-180")} />
-            {!collapsed && <span>Recolher</span>}
+            <ChevronLeft className={cn("h-4 w-4 transition-transform duration-300", collapsed && "rotate-180")} />
           </button>
+          <Link
+            to="/login"
+            className={cn(
+              "flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors",
+              collapsed && "md:w-9 md:px-0 md:justify-center",
+            )}
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span className={cn("truncate", collapsed && "md:hidden")}>Sair</span>
+          </Link>
         </div>
       </aside>
 
-      <div
-        className={cn(
-          "flex-1 flex flex-col min-w-0 transition-all duration-500",
-          collapsed ? "md:pl-[76px]" : "md:pl-[248px]",
-        )}
-      >
-        <header className="glass sticky top-0 z-30 flex h-16 items-center gap-3 px-4 md:px-8 border-b border-white/[0.05]">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10"
-            aria-label="Abrir menu"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 6h18M3 12h18M3 18h18" />
-            </svg>
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 flex-1 max-w-md">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Buscar pedidos, clientes, transportadoras…"
-                className="w-full h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition"
-              />
-            </div>
+      <div className={cn("flex flex-1 flex-col transition-all duration-500 ease-out", collapsed ? "md:pl-[76px]" : "md:pl-[248px]")}>
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.06] bg-background/80 px-6 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-muted-foreground md:hidden"
+            >
+              <Package className="h-5 w-5" />
+            </button>
+            <div className="text-sm font-semibold tracking-tight">Painel Principal</div>
           </div>
-
-          <div className="flex-1 md:hidden" />
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               to="/notificacoes"
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-muted-foreground hover:text-foreground hover:border-white/20 transition-colors"
             >
               <Bell className="h-4 w-4" />
-              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_oklch(0.74_0.18_152)]" />
-            </Link>
-            <Link
-              to="/cotacao"
-              className="hidden md:inline-flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-emerald-600 px-4 text-sm font-semibold text-black shadow-[0_8px_24px_-8px_oklch(0.74_0.18_152/0.6)] hover:brightness-110 transition"
-            >
-              <Search className="h-4 w-4" strokeWidth={2.5} />
-              Nova Cotação
+              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 grid-noise">{children}</main>
+        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">{children}</main>
       </div>
 
       <AIFab />
