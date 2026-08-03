@@ -18,6 +18,7 @@ import {
   Radar,
   BadgeDollarSign,
   Building2,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIFab } from "./ai-fab";
@@ -31,6 +32,7 @@ const nav = [
   { to: "/transportadoras", label: "Transportadoras", icon: Truck },
   { to: "/clientes", label: "Clientes", icon: Building2 },
   { to: "/cidades", label: "Cidades", icon: MapPin },
+  { to: "/auditoria", label: "Auditoria de Fretes", icon: ShieldCheck },
   { to: "/historico", label: "Histórico", icon: FileText },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
