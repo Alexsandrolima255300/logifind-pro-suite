@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendedorRouteImport } from './routes/vendedor'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as TransportadorasRouteImport } from './routes/transportadoras'
+import { Route as RodonavesRouteImport } from './routes/rodonaves'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as RastreamentoRouteImport } from './routes/rastreamento'
 import { Route as PortalRouteImport } from './routes/portal'
@@ -41,6 +42,11 @@ const UsuariosRoute = UsuariosRouteImport.update({
 const TransportadorasRoute = TransportadorasRouteImport.update({
   id: '/transportadoras',
   path: '/transportadoras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RodonavesRoute = RodonavesRouteImport.update({
+  id: '/rodonaves',
+  path: '/rodonaves',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RelatoriosRoute = RelatoriosRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRoute
   '/rastreamento': typeof RastreamentoRoute
   '/relatorios': typeof RelatoriosRoute
+  '/rodonaves': typeof RodonavesRoute
   '/transportadoras': typeof TransportadorasRoute
   '/usuarios': typeof UsuariosRoute
   '/vendedor': typeof VendedorRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalRoute
   '/rastreamento': typeof RastreamentoRoute
   '/relatorios': typeof RelatoriosRoute
+  '/rodonaves': typeof RodonavesRoute
   '/transportadoras': typeof TransportadorasRoute
   '/usuarios': typeof UsuariosRoute
   '/vendedor': typeof VendedorRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/portal': typeof PortalRoute
   '/rastreamento': typeof RastreamentoRoute
   '/relatorios': typeof RelatoriosRoute
+  '/rodonaves': typeof RodonavesRoute
   '/transportadoras': typeof TransportadorasRoute
   '/usuarios': typeof UsuariosRoute
   '/vendedor': typeof VendedorRoute
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/rastreamento'
     | '/relatorios'
+    | '/rodonaves'
     | '/transportadoras'
     | '/usuarios'
     | '/vendedor'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/rastreamento'
     | '/relatorios'
+    | '/rodonaves'
     | '/transportadoras'
     | '/usuarios'
     | '/vendedor'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/rastreamento'
     | '/relatorios'
+    | '/rodonaves'
     | '/transportadoras'
     | '/usuarios'
     | '/vendedor'
@@ -258,6 +270,7 @@ export interface RootRouteChildren {
   PortalRoute: typeof PortalRoute
   RastreamentoRoute: typeof RastreamentoRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  RodonavesRoute: typeof RodonavesRoute
   TransportadorasRoute: typeof TransportadorasRoute
   UsuariosRoute: typeof UsuariosRoute
   VendedorRoute: typeof VendedorRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/transportadoras'
       fullPath: '/transportadoras'
       preLoaderRoute: typeof TransportadorasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rodonaves': {
+      id: '/rodonaves'
+      path: '/rodonaves'
+      fullPath: '/rodonaves'
+      preLoaderRoute: typeof RodonavesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/relatorios': {
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalRoute: PortalRoute,
   RastreamentoRoute: RastreamentoRoute,
   RelatoriosRoute: RelatoriosRoute,
+  RodonavesRoute: RodonavesRoute,
   TransportadorasRoute: TransportadorasRoute,
   UsuariosRoute: UsuariosRoute,
   VendedorRoute: VendedorRoute,
