@@ -72,6 +72,8 @@ export function QuoteEngine() {
     const req: FreightRequest = {
       cepOrigem, cepDestino,
       cnpjRemetente, cnpjDestinatario,
+      cidadeDestino: destinatario?.cidade,
+      ufDestino: destinatario?.uf,
       pesoKg: parseFloat(pesoReal) || 0,
       alturaCm: parseFloat(altura) || 0,
       larguraCm: parseFloat(largura) || 0,
@@ -378,9 +380,17 @@ function ResultRow({
           )}
         </div>
         {r.mensagem && r.status !== "success" && (
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">{r.mensagem}</div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">{r.mensagem}</div>
         )}
+        {r.status === "success" && r.detalhes?.length ? (
+          <div className="mt-1 space-y-0.5">
+            {r.detalhes.map((d, k) => (
+              <div key={k} className="text-[10px] text-muted-foreground leading-snug">{d}</div>
+            ))}
+          </div>
+        ) : null}
       </div>
+
       <div className={cn("text-sm font-bold", isBestPrice ? "text-gradient-green" : "text-foreground")}>
         {r.status === "success" && r.valor !== undefined ? BRL(r.valor) : <span className="text-muted-foreground font-normal">—</span>}
       </div>
