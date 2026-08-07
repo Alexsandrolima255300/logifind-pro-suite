@@ -14,6 +14,8 @@ export type FreightRequest = {
   volumes: number;
   cnpjRemetente?: string;
   cnpjDestinatario?: string;
+  cidadeDestino?: string;
+  ufDestino?: string;
 };
 
 export type QuoteStatus = "success" | "error" | "unavailable";
@@ -25,8 +27,10 @@ export type CarrierQuoteResult = {
   valor?: number;
   prazoDias?: number;
   consultadoEm: string; // ISO datetime
-  mensagem?: string;    // erro ou motivo de indisponibilidade
+  mensagem?: string;    // erro, motivo de indisponibilidade ou observação
+  detalhes?: string[];  // breakdown do cálculo (opcional)
 };
+
 
 export interface CarrierAdapter {
   id: string;
