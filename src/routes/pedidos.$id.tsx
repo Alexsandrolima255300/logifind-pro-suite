@@ -29,7 +29,7 @@ export const Route = createFileRoute("/pedidos/$id")({
 });
 
 function PedidoDetalhe() {
-  const { pedido } = Route.useLoaderData() as ReturnType<NonNullable<typeof Route.options.loader>>;
+  const { pedido } = Route.useLoaderData() as { pedido: NonNullable<ReturnType<typeof getPedido>> };
   const cliente = getCliente(pedido.clienteId);
   const carrier = getCarrier(pedido.transportadora);
 
