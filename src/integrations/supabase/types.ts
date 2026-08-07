@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      carrier_coverage: {
+        Row: {
+          ativo: boolean
+          carrier_id: string
+          codigo_destino: string
+          created_at: string
+          dias_semana: string | null
+          frequencia: string | null
+          id: string
+          km: number | null
+          municipio_destino: string
+          municipio_destino_norm: string
+          municipio_origem: string
+          prazo_pf: number | null
+          prazo_pj: number | null
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          carrier_id: string
+          codigo_destino?: string
+          created_at?: string
+          dias_semana?: string | null
+          frequencia?: string | null
+          id?: string
+          km?: number | null
+          municipio_destino: string
+          municipio_destino_norm: string
+          municipio_origem?: string
+          prazo_pf?: number | null
+          prazo_pj?: number | null
+          uf: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          carrier_id?: string
+          codigo_destino?: string
+          created_at?: string
+          dias_semana?: string | null
+          frequencia?: string | null
+          id?: string
+          km?: number | null
+          municipio_destino?: string
+          municipio_destino_norm?: string
+          municipio_origem?: string
+          prazo_pf?: number | null
+          prazo_pj?: number | null
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
