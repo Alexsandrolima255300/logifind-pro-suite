@@ -1,11 +1,9 @@
 import type { CarrierAdapter, CarrierQuoteResult, FreightRequest } from "../types";
+import { findCoverage } from "../coverage";
 
-// Adapter Rodonaves — estrutura pronta para integração oficial.
-// Credenciais esperadas (via variáveis de ambiente ou secret store):
-//   VITE_RODONAVES_CLIENT_ID
-//   VITE_RODONAVES_CLIENT_SECRET
-// Enquanto ausentes, `isConfigured()` retorna false e o serviço reporta
-// status "unavailable" — sem valores simulados.
+// Adapter Rodonaves — cobertura validada na base de atendimento importada
+// (tabela carrier_coverage). O valor do frete depende da integração tarifária
+// oficial; enquanto ela não existir, o sistema NUNCA inventa valores.
 
 const env = (k: string): string | undefined =>
   (typeof import.meta !== "undefined" && (import.meta as { env?: Record<string, string> }).env?.[k]) ||
@@ -21,34 +19,49 @@ export const rodonavesAdapter: CarrierAdapter = {
 
   async quote(req: FreightRequest): Promise<CarrierQuoteResult> {
     const consultadoEm = new Date().toISOString();
-    if (!this.isConfigured()) {
-      return {
-        carrierId: this.id,
-        carrierNome: this.nome,
-        status: "unavailable",
-        consultadoEm,
-        mensagem: "Integração não configurada — cadastre credenciais Rodonaves",
-      };
-    }
 
+    let cobertura: Awaited<ReturnType<typeof findCoverage>> = null;
     try {
-      // TODO: chamada real à API oficial Rodonaves.
-      // const token = await getRodonavesToken();
-      // const res = await fetch("https://01wapi.rte.com.br/api/v1/simulate-quotation", {
-      //   method: "POST",
-      //   headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      //   body: JSON.stringify(mapRequest(req)),
-      // });
-      // ...
-      throw new Error("Integração oficial pendente");
+      cobertura = await findCoverage(this.id, req.cidadeDestino, req.ufDestino);
     } catch (e) {
       return {
         carrierId: this.id,
         carrierNome: this.nome,
         status: "error",
         consultadoEm,
-        mensagem: e instanceof Error ? e.message : "Falha na consulta",
+        mensagem: e instanceof Error ? e.message : "Falha ao consultar a base de atendimento.",
       };
     }
+
+    if (!cobertura) {
+      return {
+        carrierId: this.id,
+        carrierNome: this.nome,
+        status: "unavailable",
+        consultadoEm,
+        mensagem: "A Rodonaves não atende esta cidade.",
+      };
+    }
+
+    const detalhes = [
+      `Cidade atendida: ${cobertura.municipio_destino}/${cobertura.uf}`,
+      cobertura.municipio_origem ? `Origem: ${cobertura.municipio_origem}` : "",
+      cobertura.codigo_destino ? `Código do destino: ${cobertura.codigo_destino}` : "",
+      cobertura.km !== null ? `Quilometragem: ${cobertura.km} km` : "",
+      cobertura.prazo_pj !== null ? `Prazo PJ: ${cobertura.prazo_pj} dia(s)` : "",
+      cobertura.prazo_pf !== null ? `Prazo PF: ${cobertura.prazo_pf} dia(s)` : "",
+      cobertura.frequencia ? `Frequência: ${cobertura.frequencia}` : "",
+      cobertura.dias_semana ? `Dias: ${cobertura.dias_semana}` : "",
+    ].filter(Boolean);
+
+    return {
+      carrierId: this.id,
+      carrierNome: this.nome,
+      status: "unavailable",
+      consultadoEm,
+      prazoDias: cobertura.prazo_pj ?? cobertura.prazo_pf ?? undefined,
+      mensagem: "Cidade atendida — valor pendente da integração tarifária Rodonaves.",
+      detalhes,
+    };
   },
 };
