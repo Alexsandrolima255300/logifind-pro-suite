@@ -59,7 +59,7 @@ function RastreamentoPage() {
       }
     } catch {
       toast.error("Falha ao consultar rastreamento.");
-    } font-sans finally {
+    } finally {
       setLoading(false);
     }
   };

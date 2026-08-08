@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
 import { BookOpen, ShieldCheck, Truck, Zap, Code2, Database, Terminal, CheckCircle2 } from "lucide-react";
 
-export const Route = createFileRoute("/documentacao" as any)({
+export const Route = createFileRoute("/documentacao")({
   component: () => (
     <AppLayout>
       <DocumentacaoPage />
