@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { AuditPanel } from "@/components/audit-panel";
 
-export const Route = createFileRoute("/auditoria")({
+export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
     meta: [
       { title: "Auditoria de Fretes — LogiFinder" },

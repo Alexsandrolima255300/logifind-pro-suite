@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { CoverageManager } from "@/components/coverage-manager";
 
-export const Route = createFileRoute("/cidades")({
+export const Route = createFileRoute("/_authenticated/cidades")({
   head: () => ({
     meta: [
       { title: "Base de Atendimento — LogiFinder" },

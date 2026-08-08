@@ -5,7 +5,7 @@ import { PEDIDOS, BRL, getCarrier, getCliente } from "@/lib/mock/data";
 import { StatusBadge } from "@/components/status-badge";
 import { Filter, Download } from "lucide-react";
 
-export const Route = createFileRoute("/historico")({
+export const Route = createFileRoute("/_authenticated/historico")({
   head: () => ({
     meta: [
       { title: "Histórico — LogiFinder" },

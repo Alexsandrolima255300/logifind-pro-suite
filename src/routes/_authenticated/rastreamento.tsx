@@ -7,7 +7,7 @@ import { Timeline } from "@/components/timeline";
 import { PEDIDOS, getCarrier } from "@/lib/mock/data";
 import { Radar, Search } from "lucide-react";
 
-export const Route = createFileRoute("/rastreamento")({
+export const Route = createFileRoute("/_authenticated/rastreamento")({
   head: () => ({
     meta: [
       { title: "Rastreamento — LogiFinder" },
