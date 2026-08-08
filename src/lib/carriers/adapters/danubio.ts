@@ -141,7 +141,7 @@ export const danubioAdapter: CarrierAdapter = {
     const ufDestino = req.ufDestino || "";
 
     // 1. Validar cobertura antes de calcular
-    const coverage = await this.checkCoverage(cidadeDestino, ufDestino);
+    const coverage = await this.checkCoverage!(cidadeDestino, ufDestino);
     if (!coverage.atende) {
       return {
         carrierId: this.id,
