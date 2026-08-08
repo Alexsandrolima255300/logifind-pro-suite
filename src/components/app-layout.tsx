@@ -18,6 +18,7 @@ import {
   Radar,
   BadgeDollarSign,
   Building2,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIFab } from "./ai-fab";
@@ -36,6 +37,7 @@ const nav = [
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/usuarios", label: "Usuários", icon: Users },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
+  { to: "/documentacao", label: "Documentação", icon: BookOpen },
   { to: "/perfil", label: "Meu Perfil", icon: UserCircle },
 ] as const;
 

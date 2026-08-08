@@ -23,9 +23,15 @@ import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as CotacaoRouteImport } from './routes/cotacao'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
-import { Route as CidadesRouteImport } from './routes/cidades'
+import { Route as DocumentacaoRouteImport } from './routes/documentacao'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PedidosIdRouteImport } from './routes/pedidos.$id'
+
+const DocumentacaoRoute = DocumentacaoRouteImport.update({
+  id: '/documentacao',
+  path: '/documentacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 const VendedorRoute = VendedorRouteImport.update({
   id: '/vendedor',
@@ -391,6 +397,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   CotacaoRoute: CotacaoRoute,
+  DocumentacaoRoute: DocumentacaoRoute,
   HistoricoRoute: HistoricoRoute,
   LoginRoute: LoginRoute,
   NotificacoesRoute: NotificacoesRoute,

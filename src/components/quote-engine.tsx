@@ -1,331 +1,780 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import {
-  Scale, Box, Layers, DollarSign, Zap, Sparkles,
-  Ruler, Clock, CheckCircle2, AlertTriangle, WifiOff, Loader2,
+  MapPin,
+  Package as PackageIcon,
+  Scale,
+  Box,
+  DollarSign,
+  Truck,
+  Zap,
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  Plus,
+  Trash2,
+  Building2,
+  User,
+  Phone,
+  Mail,
+  Search,
+  Sparkles,
+  FileText,
+  RefreshCw,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { CompanyBlock } from "@/components/cnpj-lookup";
-import type { CnpjCompany } from "@/lib/cnpj";
-import {
-  quoteAll, validateFreightRequest,
-  type CarrierQuoteResult, type FreightRequest,
-} from "@/lib/carriers";
+import type { FreightRequest, VolumeItem, CarrierQuoteResult } from "@/lib/carriers/types";
+import { calculateCubagem, runQuoteEngine } from "@/lib/carriers";
+import { CarrierResultCard } from "./CarrierResultCard";
+import { toast } from "sonner";
 
-const tiposCarga = ["Carga Seca", "Refrigerada", "Frágil", "Perigosa", "Eletrônicos", "Alimentos", "Química"];
-const CNPJ_REMETENTE_PADRAO = "39860057000104";
-
-const BRL = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const onlyDigits = (s: string) => s.replace(/\D/g, "");
+const PRESET_VOLUMES = [
+  { label: "Caixa P", icon: "📦", altura: 10, largura: 40, comprimento: 40 },
+  { label: "Caixa M", icon: "📦", altura: 10, largura: 20, comprimento: 20 },
+  { label: "Pallet", icon: "🟫", altura: 70, largura: 70, comprimento: 70 },
+  { label: "Caixote", icon: "📫", altura: 70, largura: 70, comprimento: 100 },
+];
 
 export function QuoteEngine() {
-  const [cepOrigem, setCepOrigem] = useState("");
-  const [cepDestino, setCepDestino] = useState("");
-  const [cnpjRemetente, setCnpjRemetente] = useState("");
-  const [cnpjDestinatario, setCnpjDestinatario] = useState("");
+  // Remetente
+  const [cepOrigem, setCepOrigem] = useState("01001-000");
+  const [cidadeOrigem, setCidadeOrigem] = useState("São Paulo");
+  const [ufOrigem, setUfOrigem] = useState("SP");
+  const [enderecoOrigem, setEnderecoOrigem] = useState("Praça da Sé");
+  const [numeroOrigem, setNumeroOrigem] = useState("100");
+  const [bairroOrigem, setBairroOrigem] = useState("Sé");
+  const [complementoOrigem, setComplementoOrigem] = useState("");
+  const [cnpjRemetente, setCnpjRemetente] = useState("12.345.678/0001-90");
 
-  const [pesoReal, setPesoReal] = useState("");
-  const [altura, setAltura] = useState("");
-  const [largura, setLargura] = useState("");
-  const [comprimento, setComprimento] = useState("");
-  const [volumes, setVolumes] = useState("");
-  const [valorNF, setValorNF] = useState("");
-  const [tipoCarga, setTipoCarga] = useState("Carga Seca");
+  // Destinatário
+  const [cepDestino, setCepDestino] = useState("13010-001");
+  const [cidadeDestino, setCidadeDestino] = useState("Campinas");
+  const [ufDestino, setUfDestino] = useState("SP");
+  const [enderecoDestino, setEnderecoDestino] = useState("Avenida Francisco Glicério");
+  const [numeroDestino, setNumeroDestino] = useState("500");
+  const [bairroDestino, setBairroDestino] = useState("Centro");
+  const [complementoDestino, setComplementoDestino] = useState("");
+  const [cpfCnpjDestinatario, setCpfCnpjDestinatario] = useState("98.765.432/0001-10");
+  const [tipoCliente, setTipoCliente] = useState<"PJ" | "PF">("PJ");
 
+  // Mercadoria
+  const [valorNF, setValorNF] = useState<number>(1500);
+  const [pesoTotal, setPesoTotal] = useState<number>(45);
+
+  // Tabela de Volumes
+  const [volumesList, setVolumesList] = useState<VolumeItem[]>([
+    { id: "1", tipo: "Caixa P", alturaCm: 10, larguraCm: 40, comprimentoCm: 40, quantidade: 2, pesoUnitarioKg: 22.5 },
+  ]);
+
+  // Contato
+  const [nomeContato, setNomeContato] = useState("Alexsandro Lima");
+  const [telefoneContato, setTelefoneContato] = useState("(11) 99999-8888");
+  const [emailContato, setEmailContato] = useState("contato@logifinder.com.br");
+
+  // Transportadoras Selecionadas
+  const [selectedCarriers, setSelectedCarriers] = useState<string[]>(["rodonaves", "danubio", "braspress", "alfa"]);
+
+  // Estados de cálculo
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<CarrierQuoteResult[] | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [selectedCarrier, setSelectedCarrier] = useState<string | null>(null);
+  const [loadingCep, setLoadingCep] = useState<"origem" | "destino" | null>(null);
+  const [quoteResults, setQuoteResults] = useState<CarrierQuoteResult[] | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const handleRemetente = useCallback((c: CnpjCompany) => {
-    if (c.cep) setCepOrigem(onlyDigits(c.cep));
-    if (c.cnpj) setCnpjRemetente(onlyDigits(c.cnpj));
-  }, []);
+  // Autopreenchimento CEP via ViaCEP
+  const lookupCep = async (cep: string, target: "origem" | "destino") => {
+    const clean = cep.replace(/\D/g, "");
+    if (clean.length !== 8) return;
 
-  const handleDestinatario = useCallback((c: CnpjCompany) => {
-    if (c.cep) setCepDestino(onlyDigits(c.cep));
-    if (c.cnpj) setCnpjDestinatario(onlyDigits(c.cnpj));
-  }, []);
-
-  const cubagem = useMemo(() => {
-    const a = (parseFloat(altura) || 0) / 100;
-    const l = (parseFloat(largura) || 0) / 100;
-    const c = (parseFloat(comprimento) || 0) / 100;
-    const q = Math.max(1, parseInt(volumes) || 1);
-    return Math.max(0, a * l * c * q);
-  }, [altura, largura, comprimento, volumes]);
-
-  async function handleCotar() {
-    const req: FreightRequest = {
-      cepOrigem, cepDestino,
-      cnpjRemetente, cnpjDestinatario,
-      pesoKg: parseFloat(pesoReal) || 0,
-      alturaCm: parseFloat(altura) || 0,
-      larguraCm: parseFloat(largura) || 0,
-      comprimentoCm: parseFloat(comprimento) || 0,
-      valorNF: parseFloat(valorNF) || 0,
-      volumes: parseInt(volumes) || 0,
-    };
-    const errs = validateFreightRequest(req);
-    setErrors(errs);
-    if (errs.length) { setResults(null); return; }
-
-    setLoading(true);
-    setResults(null);
+    setLoadingCep(target);
     try {
-      const res = await quoteAll(req);
-      setResults(res);
+      const res = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        if (target === "origem") {
+          setCidadeOrigem(data.localidade || "");
+          setUfOrigem(data.uf || "");
+          setEnderecoOrigem(data.logradouro || "");
+          setBairroOrigem(data.bairro || "");
+        } else {
+          setCidadeDestino(data.localidade || "");
+          setUfDestino(data.uf || "");
+          setEnderecoDestino(data.logradouro || "");
+          setBairroDestino(data.bairro || "");
+        }
+        toast.success(`Endereço de ${target} localizado: ${data.localidade}/${data.uf}`);
+      }
+    } catch {
+      // Ignorar falha de CEP
+    } finally {
+      setLoadingCep(null);
+    }
+  };
+
+  // Totais de volumes e cubagem
+  const totalVolumesQty = useMemo(() => {
+    return volumesList.reduce((acc, item) => acc + (Number(item.quantidade) || 0), 0);
+  }, [volumesList]);
+
+  const cubagemTotalM3 = useMemo(() => {
+    return calculateCubagem(volumesList);
+  }, [volumesList]);
+
+  // Manipulação da tabela de volumes
+  const addPresetVolume = (preset: (typeof PRESET_VOLUMES)[0]) => {
+    const newItem: VolumeItem = {
+      id: Date.now().toString(),
+      tipo: preset.label,
+      alturaCm: preset.altura,
+      larguraCm: preset.largura,
+      comprimentoCm: preset.comprimento,
+      quantidade: 1,
+      pesoUnitarioKg: 10,
+    };
+    setVolumesList((prev) => [...prev, newItem]);
+  };
+
+  const addEmptyVolume = () => {
+    const newItem: VolumeItem = {
+      id: Date.now().toString(),
+      tipo: "Personalizado",
+      alturaCm: 20,
+      larguraCm: 20,
+      comprimentoCm: 20,
+      quantidade: 1,
+      pesoUnitarioKg: 5,
+    };
+    setVolumesList((prev) => [...prev, newItem]);
+  };
+
+  const removeVolume = (id?: string) => {
+    if (volumesList.length <= 1) {
+      toast.error("É necessário ter pelo menos 1 volume na cotação.");
+      return;
+    }
+    setVolumesList((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateVolume = (id: string | undefined, field: keyof VolumeItem, val: string | number) => {
+    setVolumesList((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          return { ...item, [field]: val };
+        }
+        return item;
+      })
+    );
+  };
+
+  // Disparo de Cotação ou Simulação
+  const handleRunQuote = async (modo: "simulation" | "quotation") => {
+    setLoading(true);
+    setValidationErrors([]);
+    setQuoteResults(null);
+
+    const req: FreightRequest = {
+      cepOrigem,
+      cidadeOrigem,
+      ufOrigem,
+      enderecoOrigem,
+      numeroOrigem,
+      bairroOrigem,
+      complementoOrigem,
+      cnpjRemetente,
+
+      cepDestino,
+      cidadeDestino,
+      ufDestino,
+      enderecoDestino,
+      numeroDestino,
+      bairroDestino,
+      complementoDestino,
+      cpfCnpjDestinatario,
+      tipoCliente,
+
+      valorNF,
+      pesoKg: pesoTotal,
+      volumes: totalVolumesQty || 1,
+      cubagemM3: cubagemTotalM3,
+      itensVolume: volumesList,
+
+      nomeContato,
+      telefoneContato,
+      emailContato,
+
+      modo,
+    };
+
+    try {
+      const { quotes, errors } = await runQuoteEngine(req, selectedCarriers);
+      if (errors && errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error("Por favor, corrija os erros do formulário.");
+      } else {
+        setQuoteResults(quotes);
+        toast.success(`Cotação concluída! ${quotes.filter((q) => q.atende).length} transportadoras atendem o destino.`);
+      }
+    } catch {
+      toast.error("Falha ao processar cotação.");
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  // Encontrar melhor preço e prazos
+  const cheapestValue = useMemo(() => {
+    if (!quoteResults) return undefined;
+    const valid = quoteResults.filter((q) => q.atende && q.status === "success" && q.valor !== undefined);
+    if (valid.length === 0) return undefined;
+    return Math.min(...valid.map((q) => q.valor!));
+  }, [quoteResults]);
+
+  const fastestValue = useMemo(() => {
+    if (!quoteResults) return undefined;
+    const valid = quoteResults.filter((q) => q.atende && q.status === "success" && q.prazoDias !== undefined);
+    if (valid.length === 0) return undefined;
+    return Math.min(...valid.map((q) => q.prazoDias!));
+  }, [quoteResults]);
 
   return (
-    <div className="mx-auto max-w-[1280px] p-4 md:p-8 space-y-6">
-      <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-primary/90">
-          <Sparkles className="h-3 w-3" /> Motor Inteligente de Cotação
+    <div className="mx-auto max-w-7xl space-y-8 p-4 md:p-6 text-slate-100">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-100 flex items-center gap-3">
+            <Truck className="h-8 w-8 text-blue-500" /> Nova Cotação de Frete
+          </h1>
+          <p className="mt-1 text-slate-400 text-sm">
+            Compare valores, prazos e cobertura oficial da Rodonaves, Danúbio, Braspress e Alfa em uma única consulta.
+          </p>
         </div>
-        <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight">
-          Encontre o <span className="text-gradient-green">melhor frete</span> em segundos
-        </h1>
-        <p className="mt-2 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
-          Integração direta com transportadoras — cotações reais, sem valores simulados.
-        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleRunQuote("simulation")}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Simular Frete
+          </button>
+          <button
+            onClick={() => handleRunQuote("quotation")}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50"
+          >
+            <Zap className="h-4 w-4" /> {loading ? "Calculando..." : "Gerar Cotação Oficial"}
+          </button>
+        </div>
       </div>
 
-      <div className="glass-strong rounded-3xl p-5 md:p-8 shadow-[0_40px_100px_-40px_oklch(0_0_0/0.8)]">
-        <Divider>Empresas</Divider>
-        <div className="grid grid-cols-1 gap-4">
-          <CompanyBlock role="remetente" defaultCnpj={CNPJ_REMETENTE_PADRAO} onCompanyChange={handleRemetente} />
-          <CompanyBlock role="destinatario" onCompanyChange={handleDestinatario} />
+      {/* Erros de Validação */}
+      {validationErrors.length > 0 && (
+        <div className="rounded-xl border border-red-900/80 bg-red-950/40 p-4 text-red-300">
+          <h4 className="font-bold flex items-center gap-2 text-red-200">
+            <AlertTriangle className="h-5 w-5 text-red-400" /> Verifique os erros antes de continuar:
+          </h4>
+          <ul className="mt-2 list-disc list-inside text-sm space-y-1 text-red-300">
+            {validationErrors.map((err, idx) => (
+              <li key={idx}>{err}</li>
+            ))}
+          </ul>
         </div>
+      )}
 
-        <Divider>Dados da Carga</Divider>
+      {/* Formulário Principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Card Remetente */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4 shadow-sm">
+          <h3 className="font-bold text-slate-100 text-lg flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Building2 className="h-5 w-5 text-blue-400" /> Dados do Remetente (Origem)
+          </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Field icon={Scale} label="Peso Bruto" value={pesoReal} onChange={setPesoReal} suffix="kg" type="number" />
-          <Field icon={Layers} label="Volumes" value={volumes} onChange={setVolumes} suffix="un" type="number" />
-          <Field icon={DollarSign} label="Valor NF-e" value={valorNF} onChange={setValorNF} prefix="R$" type="number" />
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-1">
-              <Box className="h-3 w-3" /> Cubagem
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-1">
+              <label className="text-xs text-slate-400 font-medium mb-1 block">CEP Origem *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={cepOrigem}
+                  onChange={(e) => setCepOrigem(e.target.value)}
+                  onBlur={() => lookupCep(cepOrigem, "origem")}
+                  placeholder="00000-000"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                />
+                {loadingCep === "origem" && (
+                  <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 animate-spin text-blue-400" />
+                )}
+              </div>
             </div>
-            <div className="text-lg font-bold text-primary">{cubagem.toFixed(3)} m³</div>
-            <div className="text-[10px] text-muted-foreground">calculado automaticamente</div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Cidade Origem *</label>
+              <input
+                type="text"
+                value={cidadeOrigem}
+                onChange={(e) => setCidadeOrigem(e.target.value)}
+                placeholder="São Paulo"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">UF Origem *</label>
+              <input
+                type="text"
+                value={ufOrigem}
+                onChange={(e) => setUfOrigem(e.target.value.toUpperCase())}
+                maxLength={2}
+                placeholder="SP"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Endereço de Origem</label>
+              <input
+                type="text"
+                value={enderecoOrigem}
+                onChange={(e) => setEnderecoOrigem(e.target.value)}
+                placeholder="Rua, Av..."
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Número</label>
+              <input
+                type="text"
+                value={numeroOrigem}
+                onChange={(e) => setNumeroOrigem(e.target.value)}
+                placeholder="100"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Bairro</label>
+              <input
+                type="text"
+                value={bairroOrigem}
+                onChange={(e) => setBairroOrigem(e.target.value)}
+                placeholder="Centro"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">CNPJ Remetente</label>
+              <input
+                type="text"
+                value={cnpjRemetente}
+                onChange={(e) => setCnpjRemetente(e.target.value)}
+                placeholder="00.000.000/0001-00"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field icon={Ruler} label="Altura" value={altura} onChange={setAltura} suffix="cm" type="number" />
-          <Field icon={Ruler} label="Largura" value={largura} onChange={setLargura} suffix="cm" type="number" />
-          <Field icon={Ruler} label="Comprimento" value={comprimento} onChange={setComprimento} suffix="cm" type="number" />
+        {/* Card Destinatário */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 className="font-bold text-slate-100 text-lg flex items-center gap-2">
+              <User className="h-5 w-5 text-emerald-400" /> Dados do Destinatário (Destino)
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setTipoCliente("PJ")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                  tipoCliente === "PJ" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400 hover:text-white"
+                }`}
+              >
+                Pessoa Jurídica (PJ)
+              </button>
+              <button
+                type="button"
+                onClick={() => setTipoCliente("PF")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                  tipoCliente === "PF" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400 hover:text-white"
+                }`}
+              >
+                Pessoa Física (PF)
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-1">
+              <label className="text-xs text-slate-400 font-medium mb-1 block">CEP Destino *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={cepDestino}
+                  onChange={(e) => setCepDestino(e.target.value)}
+                  onBlur={() => lookupCep(cepDestino, "destino")}
+                  placeholder="00000-000"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                />
+                {loadingCep === "destino" && (
+                  <RefreshCw className="absolute right-3 top-2.5 h-4 w-4 animate-spin text-emerald-400" />
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Cidade Destino *</label>
+              <input
+                type="text"
+                value={cidadeDestino}
+                onChange={(e) => setCidadeDestino(e.target.value)}
+                placeholder="Campinas"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">UF Destino *</label>
+              <input
+                type="text"
+                value={ufDestino}
+                onChange={(e) => setUfDestino(e.target.value.toUpperCase())}
+                maxLength={2}
+                placeholder="SP"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Endereço de Destino</label>
+              <input
+                type="text"
+                value={enderecoDestino}
+                onChange={(e) => setEnderecoDestino(e.target.value)}
+                placeholder="Av., Rua..."
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Número</label>
+              <input
+                type="text"
+                value={numeroDestino}
+                onChange={(e) => setNumeroDestino(e.target.value)}
+                placeholder="500"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Bairro</label>
+              <input
+                type="text"
+                value={bairroDestino}
+                onChange={(e) => setBairroDestino(e.target.value)}
+                placeholder="Centro"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">
+                {tipoCliente === "PJ" ? "CNPJ Destinatário" : "CPF Destinatário"}
+              </label>
+              <input
+                type="text"
+                value={cpfCnpjDestinatario}
+                onChange={(e) => setCpfCnpjDestinatario(e.target.value)}
+                placeholder={tipoCliente === "PJ" ? "00.000.000/0001-00" : "000.000.000-00"}
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Dados da Carga & Volumes */}
+      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <h3 className="font-bold text-slate-100 text-lg flex items-center gap-2">
+            <Box className="h-5 w-5 text-amber-400" /> Especificação da Carga e Volumes
+          </h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+              Cubagem Total: <strong className="text-amber-400">{cubagemTotalM3} m³</strong>
+            </span>
+            <span className="text-xs font-mono text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+              Total Volumes: <strong className="text-blue-400">{totalVolumesQty}</strong>
+            </span>
+          </div>
         </div>
 
-        <div className="mt-4">
-          <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Tipo de Carga</label>
-          <div className="flex flex-wrap gap-2">
-            {tiposCarga.map((t) => (
+        {/* Atalhos Rápidos de Tipos de Volume */}
+        <div>
+          <label className="text-xs text-slate-400 font-medium mb-2 block">Atalhos de Tipos de Volume Pré-Definidos:</label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {PRESET_VOLUMES.map((preset, idx) => (
               <button
-                key={t} onClick={() => setTipoCarga(t)}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all",
-                  tipoCarga === t
-                    ? "border-primary/40 bg-primary/15 text-primary shadow-[0_0_20px_-6px_oklch(0.74_0.18_152/0.6)]"
-                    : "border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-foreground hover:border-white/20",
-                )}
+                key={idx}
+                type="button"
+                onClick={() => addPresetVolume(preset)}
+                className="flex items-center gap-2 rounded-lg border border-slate-700/80 bg-slate-800/60 p-2.5 text-xs text-slate-200 hover:border-amber-500/50 hover:bg-slate-800 transition-all text-left"
               >
-                {t}
+                <span className="text-lg">{preset.icon}</span>
+                <div>
+                  <span className="font-bold block">{preset.label}</span>
+                  <span className="text-[10px] text-slate-400">
+                    {preset.altura}×{preset.largura}×{preset.comprimento} cm
+                  </span>
+                </div>
               </button>
             ))}
           </div>
         </div>
 
-        {errors.length > 0 && (
-          <div className="mt-4 rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-3 text-xs text-yellow-300">
-            <div className="font-semibold mb-1 flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5" /> Preencha os campos obrigatórios</div>
-            <ul className="list-disc pl-5 space-y-0.5">
-              {errors.map((e) => <li key={e}>{e}</li>)}
-            </ul>
-          </div>
-        )}
+        {/* Tabela de Volumes */}
+        <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="border-b border-slate-800 bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th className="p-3">Tipo</th>
+                <th className="p-3 w-20">Qtd</th>
+                <th className="p-3 w-24">Alt (cm)</th>
+                <th className="p-3 w-24">Larg (cm)</th>
+                <th className="p-3 w-24">Comp (cm)</th>
+                <th className="p-3 w-28">Peso Unit (kg)</th>
+                <th className="p-3 w-24">Cubagem (m³)</th>
+                <th className="p-3 w-12 text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {volumesList.map((item) => {
+                const volM3 = Math.round((item.alturaCm * item.larguraCm * item.comprimentoCm * item.quantidade) / 1000) / 1000;
+                return (
+                  <tr key={item.id} className="hover:bg-slate-900/50 transition-colors">
+                    <td className="p-3">
+                      <input
+                        type="text"
+                        value={item.tipo}
+                        onChange={(e) => updateVolume(item.id, "tipo", e.target.value)}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min={1}
+                        value={item.quantidade}
+                        onChange={(e) => updateVolume(item.id, "quantidade", Number(e.target.value))}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min={1}
+                        value={item.alturaCm}
+                        onChange={(e) => updateVolume(item.id, "alturaCm", Number(e.target.value))}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min={1}
+                        value={item.larguraCm}
+                        onChange={(e) => updateVolume(item.id, "larguraCm", Number(e.target.value))}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min={1}
+                        value={item.comprimentoCm}
+                        onChange={(e) => updateVolume(item.id, "comprimentoCm", Number(e.target.value))}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min={0.1}
+                        step={0.1}
+                        value={item.pesoUnitarioKg || ""}
+                        onChange={(e) => updateVolume(item.id, "pesoUnitarioKg", Number(e.target.value))}
+                        className="w-full rounded border border-slate-800 bg-slate-900 px-2 py-1 text-slate-200 focus:border-blue-500 focus:outline-none"
+                      />
+                    </td>
+                    <td className="p-3 font-mono font-semibold text-amber-400">{volM3} m³</td>
+                    <td className="p-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => removeVolume(item.id)}
+                        className="text-slate-500 hover:text-red-400 transition-colors p-1"
+                        title="Remover linha"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
-        <button
-          onClick={handleCotar}
-          disabled={loading}
-          className="group mt-6 relative w-full flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-br from-primary via-emerald-500 to-emerald-600 py-4 md:py-5 text-base md:text-lg font-bold tracking-tight text-black shadow-[0_20px_60px_-20px_oklch(0.74_0.18_152/0.8)] hover:brightness-110 transition overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5" strokeWidth={2.5} />}
-          {loading ? "CONSULTANDO TRANSPORTADORAS..." : "CALCULAR FRETE"}
-        </button>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <button
+            type="button"
+            onClick={addEmptyVolume}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+          >
+            <Plus className="h-3.5 w-3.5" /> Adicionar Outro Volume
+          </button>
+
+          <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Valor da NF-e (R$) *</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input
+                  type="number"
+                  min={1}
+                  value={valorNF}
+                  onChange={(e) => setValorNF(Number(e.target.value))}
+                  placeholder="1500"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 pl-8 pr-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 font-medium mb-1 block">Peso Total (kg) *</label>
+              <div className="relative">
+                <Scale className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input
+                  type="number"
+                  min={0.1}
+                  step={0.1}
+                  value={pesoTotal}
+                  onChange={(e) => setPesoTotal(Number(e.target.value))}
+                  placeholder="45"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 pl-8 pr-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {results && (
-        <ResultsTable
-          results={results}
-          selected={selectedCarrier}
-          onSelect={setSelectedCarrier}
-        />
-      )}
-    </div>
-  );
-}
+      {/* Card Seleção de Transportadoras & Contato */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4 shadow-sm">
+          <h3 className="font-bold text-slate-100 text-lg flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Truck className="h-5 w-5 text-sky-400" /> Transportadoras a Consultar
+          </h3>
+          <p className="text-xs text-slate-400">
+            Selecione quais transportadoras farão parte da comparação de frete e cobertura:
+          </p>
 
-function ResultsTable({
-  results, selected, onSelect,
-}: {
-  results: CarrierQuoteResult[];
-  selected: string | null;
-  onSelect: (id: string) => void;
-}) {
-  const successCount = results.filter((r) => r.status === "success").length;
-  return (
-    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-6 duration-500">
-      <div className="glass rounded-2xl p-4 md:p-5 flex items-center justify-between gap-4">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Cotações recebidas</div>
-          <div className="text-xl font-bold">
-            <span className="text-gradient-green">{successCount}</span>
-            <span className="text-muted-foreground text-sm font-medium"> / {results.length} transportadoras</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { id: "rodonaves", name: "Rodonaves", tag: "API Oficial / Malha" },
+              { id: "danubio", name: "Danúbio", tag: "Regra Própria" },
+              { id: "braspress", name: "Braspress", tag: "API Oficial" },
+              { id: "alfa", name: "Alfa Transportes", tag: "API Oficial" },
+            ].map((c) => {
+              const isChecked = selectedCarriers.includes(c.id);
+              return (
+                <label
+                  key={c.id}
+                  className={`flex cursor-pointer flex-col justify-between rounded-xl border p-3 transition-all ${
+                    isChecked
+                      ? "border-blue-500/60 bg-blue-950/20 text-white"
+                      : "border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm">{c.name}</span>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedCarriers((prev) => [...prev, c.id]);
+                        } else {
+                          setSelectedCarriers((prev) => prev.filter((item) => item !== c.id));
+                        }
+                      }}
+                      className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <span className="text-[10px] text-slate-500 mt-2 font-mono">{c.tag}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
-        <div className="text-xs text-muted-foreground text-right">
-          Ordenadas do menor para o maior valor
-        </div>
-      </div>
 
-      <div className="glass rounded-2xl overflow-hidden">
-        <div className="hidden md:grid grid-cols-[1.4fr_1fr_1fr_1.2fr_1fr_1.5fr] gap-3 px-5 py-3 text-[10px] uppercase tracking-wider text-muted-foreground border-b border-white/[0.06]">
-          <div>Transportadora</div>
-          <div>Valor</div>
-          <div>Prazo</div>
-          <div>Consultado em</div>
-          <div>Status</div>
-          <div className="text-right">Ação</div>
-        </div>
-        <div className="divide-y divide-white/[0.04]">
-          {results.map((r, i) => (
-            <ResultRow
-              key={r.carrierId}
-              r={r}
-              index={i}
-              selected={selected === r.carrierId}
-              onSelect={() => r.status === "success" && onSelect(r.carrierId)}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4 shadow-sm">
+          <h3 className="font-bold text-slate-100 text-lg flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Mail className="h-5 w-5 text-purple-400" /> Contato da Cotação
+          </h3>
+
+          <div>
+            <label className="text-xs text-slate-400 font-medium mb-1 block">Nome do Contato</label>
+            <input
+              type="text"
+              value={nomeContato}
+              onChange={(e) => setNomeContato(e.target.value)}
+              placeholder="Nome completo"
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
             />
-          ))}
+          </div>
+          <div>
+            <label className="text-xs text-slate-400 font-medium mb-1 block">Telefone / Celular</label>
+            <input
+              type="text"
+              value={telefoneContato}
+              onChange={(e) => setTelefoneContato(e.target.value)}
+              placeholder="(11) 99999-9999"
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400 font-medium mb-1 block">E-mail</label>
+            <input
+              type="email"
+              value={emailContato}
+              onChange={(e) => setEmailContato(e.target.value)}
+              placeholder="email@empresa.com.br"
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ResultRow({
-  r, index, selected, onSelect,
-}: {
-  r: CarrierQuoteResult; index: number; selected: boolean; onSelect: () => void;
-}) {
-  const dateLabel = new Date(r.consultadoEm).toLocaleString("pt-BR", {
-    day: "2-digit", month: "2-digit", year: "2-digit",
-    hour: "2-digit", minute: "2-digit",
-  });
-  return (
-    <div
-      className={cn(
-        "grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr_1fr_1.5fr] gap-3 px-5 py-4 items-center transition animate-in fade-in slide-in-from-bottom-2",
-        selected ? "bg-primary/10 ring-1 ring-inset ring-primary/40" : "hover:bg-white/[0.02]",
+      {/* Resultados da Cotação */}
+      {quoteResults && (
+        <div className="space-y-4 pt-4 border-t border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h2 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-400" /> Resultados da Comparação de Frete
+            </h2>
+            <span className="text-xs text-slate-400">
+              Origem: <strong>{cidadeOrigem}/{ufOrigem}</strong> → Destino: <strong>{cidadeDestino}/{ufDestino}</strong>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quoteResults.map((q) => (
+              <CarrierResultCard
+                key={q.carrierId}
+                quote={q}
+                isCheapest={q.valor !== undefined && q.valor === cheapestValue}
+                isFastest={q.prazoDias !== undefined && q.prazoDias === fastestValue}
+              />
+            ))}
+          </div>
+        </div>
       )}
-      style={{ animationDelay: `${index * 40}ms` }}
-    >
-      <div className="col-span-2 md:col-span-1">
-        <div className="text-sm font-bold truncate">{r.carrierNome}</div>
-        {r.mensagem && r.status !== "success" && (
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">{r.mensagem}</div>
-        )}
-      </div>
-      <div className="text-sm font-bold text-gradient-green">
-        {r.status === "success" && r.valor !== undefined ? BRL(r.valor) : <span className="text-muted-foreground font-normal">—</span>}
-      </div>
-      <div className="text-sm">
-        {r.status === "success" && r.prazoDias !== undefined
-          ? <span className="font-semibold">{r.prazoDias} {r.prazoDias === 1 ? "dia" : "dias"}</span>
-          : <span className="text-muted-foreground">—</span>}
-      </div>
-      <div className="text-[11px] text-muted-foreground">{dateLabel}</div>
-      <StatusBadge status={r.status} />
-      <div className="col-span-2 md:col-span-1 md:text-right">
-        <button
-          disabled={r.status !== "success"}
-          onClick={onSelect}
-          className={cn(
-            "rounded-xl border px-4 py-2 text-xs font-semibold transition",
-            r.status !== "success"
-              ? "bg-white/[0.02] border-white/[0.06] text-muted-foreground cursor-not-allowed"
-              : selected
-                ? "bg-primary text-black border-primary hover:brightness-110"
-                : "bg-primary/15 border-primary/30 text-primary hover:bg-primary/20",
-          )}
-        >
-          {selected ? "Selecionada" : r.status === "success" ? "Selecionar" : "Indisponível"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: CarrierQuoteResult["status"] }) {
-  if (status === "success") {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-        <CheckCircle2 className="h-3.5 w-3.5" /> Sucesso
-      </span>
-    );
-  }
-  if (status === "error") {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-400">
-        <AlertTriangle className="h-3.5 w-3.5" /> Erro
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-yellow-400">
-      <WifiOff className="h-3.5 w-3.5" /> Indisponível
-    </span>
-  );
-}
-
-function Divider({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="my-6 flex items-center gap-4">
-      <div className="h-px flex-1 bg-white/[0.06]" />
-      <span className="text-[10px] uppercase tracking-[0.24em] text-muted-foreground">{children}</span>
-      <div className="h-px flex-1 bg-white/[0.06]" />
-    </div>
-  );
-}
-
-function Field({
-  icon: Icon, label, value, onChange, prefix, suffix, type = "text",
-}: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  label: string; value: string; onChange: (v: string) => void;
-  prefix?: string; suffix?: string; type?: string;
-}) {
-  return (
-    <div>
-      <label className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-1">
-        <Icon className="h-3 w-3" strokeWidth={2} />
-        <span className="truncate">{label}</span>
-      </label>
-      <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">{prefix}</span>}
-        <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
-          className={cn(
-            "w-full h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] text-sm font-semibold focus:outline-none focus:border-primary/50 transition",
-            prefix ? "pl-9" : "pl-3", suffix ? "pr-10" : "pr-3",
-          )} />
-        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-medium text-muted-foreground">{suffix}</span>}
-      </div>
     </div>
   );
 }
