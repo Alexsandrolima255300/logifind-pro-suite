@@ -9,197 +9,207 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VendedorRouteImport } from './routes/vendedor'
-import { Route as UsuariosRouteImport } from './routes/usuarios'
-import { Route as TransportadorasRouteImport } from './routes/transportadoras'
-import { Route as RodonavesRouteImport } from './routes/rodonaves'
-import { Route as RelatoriosRouteImport } from './routes/relatorios'
-import { Route as RastreamentoRouteImport } from './routes/rastreamento'
-import { Route as PortalRouteImport } from './routes/portal'
-import { Route as PerfilRouteImport } from './routes/perfil'
-import { Route as PedidosRouteImport } from './routes/pedidos'
-import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as HistoricoRouteImport } from './routes/historico'
-import { Route as CotacaoRouteImport } from './routes/cotacao'
-import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
-import { Route as ClientesRouteImport } from './routes/clientes'
-import { Route as CidadesRouteImport } from './routes/cidades'
-import { Route as AuditoriaRouteImport } from './routes/auditoria'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PedidosIdRouteImport } from './routes/pedidos.$id'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedVendedorRouteImport } from './routes/_authenticated/vendedor'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
+import { Route as AuthenticatedTransportadorasRouteImport } from './routes/_authenticated/transportadoras'
+import { Route as AuthenticatedRodonavesRouteImport } from './routes/_authenticated/rodonaves'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedRastreamentoRouteImport } from './routes/_authenticated/rastreamento'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
+import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
+import { Route as AuthenticatedCotacaoRouteImport } from './routes/_authenticated/cotacao'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
+import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedCidadesRouteImport } from './routes/_authenticated/cidades'
+import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
+import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 
-const VendedorRoute = VendedorRouteImport.update({
-  id: '/vendedor',
-  path: '/vendedor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UsuariosRoute = UsuariosRouteImport.update({
-  id: '/usuarios',
-  path: '/usuarios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransportadorasRoute = TransportadorasRouteImport.update({
-  id: '/transportadoras',
-  path: '/transportadoras',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RodonavesRoute = RodonavesRouteImport.update({
-  id: '/rodonaves',
-  path: '/rodonaves',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RelatoriosRoute = RelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RastreamentoRoute = RastreamentoRouteImport.update({
-  id: '/rastreamento',
-  path: '/rastreamento',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalRoute = PortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilRoute = PerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PedidosRoute = PedidosRouteImport.update({
-  id: '/pedidos',
-  path: '/pedidos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificacoesRoute = NotificacoesRouteImport.update({
-  id: '/notificacoes',
-  path: '/notificacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HistoricoRoute = HistoricoRouteImport.update({
-  id: '/historico',
-  path: '/historico',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CotacaoRoute = CotacaoRouteImport.update({
-  id: '/cotacao',
-  path: '/cotacao',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClientesRoute = ClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CidadesRoute = CidadesRouteImport.update({
-  id: '/cidades',
-  path: '/cidades',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuditoriaRoute = AuditoriaRouteImport.update({
-  id: '/auditoria',
-  path: '/auditoria',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const PedidosIdRoute = PedidosIdRouteImport.update({
+const AuthenticatedVendedorRoute = AuthenticatedVendedorRouteImport.update({
+  id: '/vendedor',
+  path: '/vendedor',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTransportadorasRoute =
+  AuthenticatedTransportadorasRouteImport.update({
+    id: '/transportadoras',
+    path: '/transportadoras',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRodonavesRoute = AuthenticatedRodonavesRouteImport.update({
+  id: '/rodonaves',
+  path: '/rodonaves',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRastreamentoRoute =
+  AuthenticatedRastreamentoRouteImport.update({
+    id: '/rastreamento',
+    path: '/rastreamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNotificacoesRoute =
+  AuthenticatedNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCotacaoRoute = AuthenticatedCotacaoRouteImport.update({
+  id: '/cotacao',
+  path: '/cotacao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCidadesRoute = AuthenticatedCidadesRouteImport.update({
+  id: '/cidades',
+  path: '/cidades',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPedidosIdRoute = AuthenticatedPedidosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => PedidosRoute,
+  getParentRoute: () => AuthenticatedPedidosRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/auditoria': typeof AuditoriaRoute
-  '/cidades': typeof CidadesRoute
-  '/clientes': typeof ClientesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/cotacao': typeof CotacaoRoute
-  '/historico': typeof HistoricoRoute
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
-  '/notificacoes': typeof NotificacoesRoute
-  '/pedidos': typeof PedidosRouteWithChildren
-  '/perfil': typeof PerfilRoute
-  '/portal': typeof PortalRoute
-  '/rastreamento': typeof RastreamentoRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/rodonaves': typeof RodonavesRoute
-  '/transportadoras': typeof TransportadorasRoute
-  '/usuarios': typeof UsuariosRoute
-  '/vendedor': typeof VendedorRoute
-  '/pedidos/$id': typeof PedidosIdRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/cidades': typeof AuthenticatedCidadesRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/cotacao': typeof AuthenticatedCotacaoRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/pedidos': typeof AuthenticatedPedidosRouteWithChildren
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/rastreamento': typeof AuthenticatedRastreamentoRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/rodonaves': typeof AuthenticatedRodonavesRoute
+  '/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/vendedor': typeof AuthenticatedVendedorRoute
+  '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/auditoria': typeof AuditoriaRoute
-  '/cidades': typeof CidadesRoute
-  '/clientes': typeof ClientesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/cotacao': typeof CotacaoRoute
-  '/historico': typeof HistoricoRoute
   '/login': typeof LoginRoute
-  '/notificacoes': typeof NotificacoesRoute
-  '/pedidos': typeof PedidosRouteWithChildren
-  '/perfil': typeof PerfilRoute
-  '/portal': typeof PortalRoute
-  '/rastreamento': typeof RastreamentoRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/rodonaves': typeof RodonavesRoute
-  '/transportadoras': typeof TransportadorasRoute
-  '/usuarios': typeof UsuariosRoute
-  '/vendedor': typeof VendedorRoute
-  '/pedidos/$id': typeof PedidosIdRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/cidades': typeof AuthenticatedCidadesRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/cotacao': typeof AuthenticatedCotacaoRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/pedidos': typeof AuthenticatedPedidosRouteWithChildren
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/rastreamento': typeof AuthenticatedRastreamentoRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/rodonaves': typeof AuthenticatedRodonavesRoute
+  '/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/vendedor': typeof AuthenticatedVendedorRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/auditoria': typeof AuditoriaRoute
-  '/cidades': typeof CidadesRoute
-  '/clientes': typeof ClientesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/cotacao': typeof CotacaoRoute
-  '/historico': typeof HistoricoRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/notificacoes': typeof NotificacoesRoute
-  '/pedidos': typeof PedidosRouteWithChildren
-  '/perfil': typeof PerfilRoute
-  '/portal': typeof PortalRoute
-  '/rastreamento': typeof RastreamentoRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/rodonaves': typeof RodonavesRoute
-  '/transportadoras': typeof TransportadorasRoute
-  '/usuarios': typeof UsuariosRoute
-  '/vendedor': typeof VendedorRoute
-  '/pedidos/$id': typeof PedidosIdRoute
+  '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/_authenticated/cidades': typeof AuthenticatedCidadesRoute
+  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/_authenticated/cotacao': typeof AuthenticatedCotacaoRoute
+  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
+  '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/_authenticated/pedidos': typeof AuthenticatedPedidosRouteWithChildren
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/rastreamento': typeof AuthenticatedRastreamentoRoute
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/rodonaves': typeof AuthenticatedRodonavesRoute
+  '/_authenticated/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
+  '/_authenticated/vendedor': typeof AuthenticatedVendedorRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
     | '/auditoria'
     | '/cidades'
     | '/clientes'
     | '/configuracoes'
     | '/cotacao'
     | '/historico'
-    | '/login'
     | '/notificacoes'
     | '/pedidos'
     | '/perfil'
@@ -213,14 +223,13 @@ export interface FileRouteTypes {
     | '/pedidos/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/login'
     | '/auditoria'
     | '/cidades'
     | '/clientes'
     | '/configuracoes'
     | '/cotacao'
     | '/historico'
-    | '/login'
     | '/notificacoes'
     | '/pedidos'
     | '/perfil'
@@ -231,123 +240,39 @@ export interface FileRouteTypes {
     | '/transportadoras'
     | '/usuarios'
     | '/vendedor'
+    | '/'
     | '/pedidos/$id'
   id:
     | '__root__'
-    | '/'
-    | '/auditoria'
-    | '/cidades'
-    | '/clientes'
-    | '/configuracoes'
-    | '/cotacao'
-    | '/historico'
+    | '/_authenticated'
     | '/login'
-    | '/notificacoes'
-    | '/pedidos'
-    | '/perfil'
-    | '/portal'
-    | '/rastreamento'
-    | '/relatorios'
-    | '/rodonaves'
-    | '/transportadoras'
-    | '/usuarios'
-    | '/vendedor'
-    | '/pedidos/$id'
+    | '/_authenticated/auditoria'
+    | '/_authenticated/cidades'
+    | '/_authenticated/clientes'
+    | '/_authenticated/configuracoes'
+    | '/_authenticated/cotacao'
+    | '/_authenticated/historico'
+    | '/_authenticated/notificacoes'
+    | '/_authenticated/pedidos'
+    | '/_authenticated/perfil'
+    | '/_authenticated/portal'
+    | '/_authenticated/rastreamento'
+    | '/_authenticated/relatorios'
+    | '/_authenticated/rodonaves'
+    | '/_authenticated/transportadoras'
+    | '/_authenticated/usuarios'
+    | '/_authenticated/vendedor'
+    | '/_authenticated/'
+    | '/_authenticated/pedidos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuditoriaRoute: typeof AuditoriaRoute
-  CidadesRoute: typeof CidadesRoute
-  ClientesRoute: typeof ClientesRoute
-  ConfiguracoesRoute: typeof ConfiguracoesRoute
-  CotacaoRoute: typeof CotacaoRoute
-  HistoricoRoute: typeof HistoricoRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  NotificacoesRoute: typeof NotificacoesRoute
-  PedidosRoute: typeof PedidosRouteWithChildren
-  PerfilRoute: typeof PerfilRoute
-  PortalRoute: typeof PortalRoute
-  RastreamentoRoute: typeof RastreamentoRoute
-  RelatoriosRoute: typeof RelatoriosRoute
-  RodonavesRoute: typeof RodonavesRoute
-  TransportadorasRoute: typeof TransportadorasRoute
-  UsuariosRoute: typeof UsuariosRoute
-  VendedorRoute: typeof VendedorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vendedor': {
-      id: '/vendedor'
-      path: '/vendedor'
-      fullPath: '/vendedor'
-      preLoaderRoute: typeof VendedorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/usuarios': {
-      id: '/usuarios'
-      path: '/usuarios'
-      fullPath: '/usuarios'
-      preLoaderRoute: typeof UsuariosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transportadoras': {
-      id: '/transportadoras'
-      path: '/transportadoras'
-      fullPath: '/transportadoras'
-      preLoaderRoute: typeof TransportadorasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rodonaves': {
-      id: '/rodonaves'
-      path: '/rodonaves'
-      fullPath: '/rodonaves'
-      preLoaderRoute: typeof RodonavesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/relatorios': {
-      id: '/relatorios'
-      path: '/relatorios'
-      fullPath: '/relatorios'
-      preLoaderRoute: typeof RelatoriosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rastreamento': {
-      id: '/rastreamento'
-      path: '/rastreamento'
-      fullPath: '/rastreamento'
-      preLoaderRoute: typeof RastreamentoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal': {
-      id: '/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof PortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfil': {
-      id: '/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof PerfilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pedidos': {
-      id: '/pedidos'
-      path: '/pedidos'
-      fullPath: '/pedidos'
-      preLoaderRoute: typeof PedidosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notificacoes': {
-      id: '/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/notificacoes'
-      preLoaderRoute: typeof NotificacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -355,95 +280,199 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/historico': {
-      id: '/historico'
-      path: '/historico'
-      fullPath: '/historico'
-      preLoaderRoute: typeof HistoricoRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cotacao': {
-      id: '/cotacao'
-      path: '/cotacao'
-      fullPath: '/cotacao'
-      preLoaderRoute: typeof CotacaoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configuracoes': {
-      id: '/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/configuracoes'
-      preLoaderRoute: typeof ConfiguracoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clientes': {
-      id: '/clientes'
-      path: '/clientes'
-      fullPath: '/clientes'
-      preLoaderRoute: typeof ClientesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cidades': {
-      id: '/cidades'
-      path: '/cidades'
-      fullPath: '/cidades'
-      preLoaderRoute: typeof CidadesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auditoria': {
-      id: '/auditoria'
-      path: '/auditoria'
-      fullPath: '/auditoria'
-      preLoaderRoute: typeof AuditoriaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/pedidos/$id': {
-      id: '/pedidos/$id'
+    '/_authenticated/vendedor': {
+      id: '/_authenticated/vendedor'
+      path: '/vendedor'
+      fullPath: '/vendedor'
+      preLoaderRoute: typeof AuthenticatedVendedorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/transportadoras': {
+      id: '/_authenticated/transportadoras'
+      path: '/transportadoras'
+      fullPath: '/transportadoras'
+      preLoaderRoute: typeof AuthenticatedTransportadorasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rodonaves': {
+      id: '/_authenticated/rodonaves'
+      path: '/rodonaves'
+      fullPath: '/rodonaves'
+      preLoaderRoute: typeof AuthenticatedRodonavesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/relatorios': {
+      id: '/_authenticated/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rastreamento': {
+      id: '/_authenticated/rastreamento'
+      path: '/rastreamento'
+      fullPath: '/rastreamento'
+      preLoaderRoute: typeof AuthenticatedRastreamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pedidos': {
+      id: '/_authenticated/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof AuthenticatedPedidosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notificacoes': {
+      id: '/_authenticated/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historico': {
+      id: '/_authenticated/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cotacao': {
+      id: '/_authenticated/cotacao'
+      path: '/cotacao'
+      fullPath: '/cotacao'
+      preLoaderRoute: typeof AuthenticatedCotacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clientes': {
+      id: '/_authenticated/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cidades': {
+      id: '/_authenticated/cidades'
+      path: '/cidades'
+      fullPath: '/cidades'
+      preLoaderRoute: typeof AuthenticatedCidadesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auditoria': {
+      id: '/_authenticated/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pedidos/$id': {
+      id: '/_authenticated/pedidos/$id'
       path: '/$id'
       fullPath: '/pedidos/$id'
-      preLoaderRoute: typeof PedidosIdRouteImport
-      parentRoute: typeof PedidosRoute
+      preLoaderRoute: typeof AuthenticatedPedidosIdRouteImport
+      parentRoute: typeof AuthenticatedPedidosRoute
     }
   }
 }
 
-interface PedidosRouteChildren {
-  PedidosIdRoute: typeof PedidosIdRoute
+interface AuthenticatedPedidosRouteChildren {
+  AuthenticatedPedidosIdRoute: typeof AuthenticatedPedidosIdRoute
 }
 
-const PedidosRouteChildren: PedidosRouteChildren = {
-  PedidosIdRoute: PedidosIdRoute,
+const AuthenticatedPedidosRouteChildren: AuthenticatedPedidosRouteChildren = {
+  AuthenticatedPedidosIdRoute: AuthenticatedPedidosIdRoute,
 }
 
-const PedidosRouteWithChildren =
-  PedidosRoute._addFileChildren(PedidosRouteChildren)
+const AuthenticatedPedidosRouteWithChildren =
+  AuthenticatedPedidosRoute._addFileChildren(AuthenticatedPedidosRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
+  AuthenticatedCidadesRoute: typeof AuthenticatedCidadesRoute
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
+  AuthenticatedCotacaoRoute: typeof AuthenticatedCotacaoRoute
+  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
+  AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
+  AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRouteWithChildren
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedRastreamentoRoute: typeof AuthenticatedRastreamentoRoute
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedRodonavesRoute: typeof AuthenticatedRodonavesRoute
+  AuthenticatedTransportadorasRoute: typeof AuthenticatedTransportadorasRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
+  AuthenticatedVendedorRoute: typeof AuthenticatedVendedorRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
+  AuthenticatedCidadesRoute: AuthenticatedCidadesRoute,
+  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
+  AuthenticatedCotacaoRoute: AuthenticatedCotacaoRoute,
+  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
+  AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
+  AuthenticatedPedidosRoute: AuthenticatedPedidosRouteWithChildren,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedRastreamentoRoute: AuthenticatedRastreamentoRoute,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedRodonavesRoute: AuthenticatedRodonavesRoute,
+  AuthenticatedTransportadorasRoute: AuthenticatedTransportadorasRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
+  AuthenticatedVendedorRoute: AuthenticatedVendedorRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuditoriaRoute: AuditoriaRoute,
-  CidadesRoute: CidadesRoute,
-  ClientesRoute: ClientesRoute,
-  ConfiguracoesRoute: ConfiguracoesRoute,
-  CotacaoRoute: CotacaoRoute,
-  HistoricoRoute: HistoricoRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  NotificacoesRoute: NotificacoesRoute,
-  PedidosRoute: PedidosRouteWithChildren,
-  PerfilRoute: PerfilRoute,
-  PortalRoute: PortalRoute,
-  RastreamentoRoute: RastreamentoRoute,
-  RelatoriosRoute: RelatoriosRoute,
-  RodonavesRoute: RodonavesRoute,
-  TransportadorasRoute: TransportadorasRoute,
-  UsuariosRoute: UsuariosRoute,
-  VendedorRoute: VendedorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { Bell, Mail, Palette, Sliders, Truck, KeyRound } from "lucide-react";
 
-export const Route = createFileRoute("/configuracoes")({
+export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({
     meta: [
       { title: "Configurações — LogiFinder" },

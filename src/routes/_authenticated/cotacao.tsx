@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
 import { QuoteEngine } from "@/components/quote-engine";
 
-export const Route = createFileRoute("/cotacao")({
+export const Route = createFileRoute("/_authenticated/cotacao")({
   head: () => ({
     meta: [
       { title: "Nova Cotação — LogiFinder" },

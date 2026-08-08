@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { RodonavesPanel } from "@/components/rodonaves-panel";
 
-export const Route = createFileRoute("/rodonaves")({
+export const Route = createFileRoute("/_authenticated/rodonaves")({
   head: () => ({
     meta: [
       { title: "Integração Rodonaves — LogiFinder" },

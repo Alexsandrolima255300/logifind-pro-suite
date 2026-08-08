@@ -5,7 +5,7 @@ import { NOTIFICACOES } from "@/lib/mock/data";
 import { Bell, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/notificacoes")({
+export const Route = createFileRoute("/_authenticated/notificacoes")({
   head: () => ({
     meta: [
       { title: "Notificações — LogiFinder" },

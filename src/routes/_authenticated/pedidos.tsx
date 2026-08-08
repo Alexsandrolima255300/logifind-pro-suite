@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { PEDIDOS, BRL, getCliente, getCarrier } from "@/lib/mock/data";
 import { ArrowUpRight, MapPin } from "lucide-react";
 
-export const Route = createFileRoute("/pedidos")({
+export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => ({
     meta: [
       { title: "Pedidos — LogiFinder" },

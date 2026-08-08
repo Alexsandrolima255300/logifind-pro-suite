@@ -5,7 +5,7 @@ import { Timeline } from "@/components/timeline";
 import { PEDIDOS, getCarrier, getCliente, BRL } from "@/lib/mock/data";
 import { Package, Download, Phone, Mail } from "lucide-react";
 
-export const Route = createFileRoute("/portal")({
+export const Route = createFileRoute("/_authenticated/portal")({
   head: () => ({
     meta: [
       { title: "Portal do Cliente — LogiFinder" },
