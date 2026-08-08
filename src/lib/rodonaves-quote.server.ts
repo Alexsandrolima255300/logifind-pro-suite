@@ -82,7 +82,7 @@ export type RteQuoteOutput = {
   unidadeDestino?: string;
   gateway?: string;
   mensagem?: string;
-  raw?: Record<string, unknown>;
+  raw?: string;
 };
 
 /** Passo 7 — cotação oficial. Tenta o gateway novo e cai para o legado. */
@@ -146,7 +146,7 @@ export async function quoteRodonavesApi(input: RteQuoteInput): Promise<RteQuoteO
         unidadeDestino: json["UnitDestinyDescription"] ? String(json["UnitDestinyDescription"]) : undefined,
         gateway: host,
         mensagem: json["Message"] ? String(json["Message"]) : undefined,
-        raw: json,
+        raw: text,
       };
     } catch (e) {
       lastMessage = e instanceof Error ? e.message : lastMessage;
