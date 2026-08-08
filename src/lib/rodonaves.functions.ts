@@ -59,3 +59,26 @@ export const callRodonaves = createServerFn({ method: "POST" })
       return { ok: false as const, error: e instanceof Error ? e.message : "Falha na requisição." };
     }
   });
+
+/** Cotação oficial Rodonaves (token -> city id por CEP -> gera-cotacao). */
+export const quoteRodonaves = createServerFn({ method: "POST" })
+  .inputValidator((data: {
+    cepOrigem: string;
+    cepDestino: string;
+    pesoKg: number;
+    valorNF: number;
+    volumes: number;
+    cnpjRemetente: string;
+    cpfCnpjDestinatario: string;
+    nomeContato?: string;
+    telefoneContato?: string;
+    emailContato?: string;
+    packs?: { quantidade: number; pesoKg: number; alturaCm: number; larguraCm: number; comprimentoCm: number }[];
+  }) => {
+    if (!data) throw new Error("Dados obrigatórios.");
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const { quoteRodonavesApi } = await import("./rodonaves-quote.server");
+    return quoteRodonavesApi(data);
+  });

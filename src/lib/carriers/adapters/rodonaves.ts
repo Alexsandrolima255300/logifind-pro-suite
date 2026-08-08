@@ -293,7 +293,7 @@ export const rodonavesAdapter: CarrierAdapter = {
     const cleanZipDest = (req.cepDestino || "").replace(/\D/g, "");
 
     // 1. Validar cobertura antes de cotar
-    const coverage = await this.checkCoverage(req.cidadeDestino || "", req.ufDestino || "");
+    const coverage = await this.checkCoverage!(req.cidadeDestino || "", req.ufDestino || "");
     if (!coverage.atende) {
       return {
         carrierId: this.id,
