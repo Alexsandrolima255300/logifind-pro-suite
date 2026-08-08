@@ -8,24 +8,13 @@ import {
   CheckCircle2,
   AlertTriangle,
   Clock,
-  MapPin,
-  FileText,
-  UserCheck,
-  Building,
-  Calendar,
-  Download,
-  RefreshCw,
 } from "lucide-react";
 import { fetchRodonavesTracking, fetchRodonavesDeliveryReceipt } from "@/lib/carriers";
 import type { TrackingResult } from "@/lib/carriers/types";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/rastreamento")({
-  component: () => (
-    <AppLayout>
-      <RastreamentoPage />
-    </AppLayout>
-  ),
+export const Route = createFileRoute("/_authenticated/rastreamento")({
+  component: () => <RastreamentoPage />,
 });
 
 function RastreamentoPage() {
@@ -64,14 +53,13 @@ function RastreamentoPage() {
 
       if (res.status === "found") {
         toast.success("Rastreamento localizado!");
-        // Tentar obter comprovante em segundo plano
         fetchRodonavesDeliveryReceipt(params).then((r) => setReceiptData(r));
       } else {
         toast.warning(res.mensagem || "Rastreamento não localizado.");
       }
     } catch {
       toast.error("Falha ao consultar rastreamento.");
-    } finally {
+    } font-sans finally {
       setLoading(false);
     }
   };
@@ -210,7 +198,6 @@ function RastreamentoPage() {
               <div className="relative border-l-2 border-slate-700 ml-4 space-y-6 py-2">
                 {trackingResult.eventos.map((evt, idx) => (
                   <div key={idx} className="relative pl-6">
-                    {/* Marcador */}
                     <div
                       className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 ${
                         evt.categoria === "Sucesso"

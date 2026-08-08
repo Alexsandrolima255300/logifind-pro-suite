@@ -5,7 +5,7 @@ import { CLIENTES, BRL } from "@/lib/mock/data";
 import { Building2, Plus, Search } from "lucide-react";
 import { useState } from "react";
 
-export const Route = createFileRoute("/clientes")({
+export const Route = createFileRoute("/_authenticated/clientes")({
   head: () => ({
     meta: [
       { title: "Clientes — LogiFinder" },

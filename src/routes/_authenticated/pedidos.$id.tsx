@@ -6,7 +6,7 @@ import { Timeline } from "@/components/timeline";
 import { getPedido, getCliente, getCarrier, BRL } from "@/lib/mock/data";
 import { ArrowLeft, Truck, User, Package as PackageIcon, MapPin, Calendar, Hash } from "lucide-react";
 
-export const Route = createFileRoute("/pedidos/$id")({
+export const Route = createFileRoute("/_authenticated/pedidos/$id")({
   head: ({ params }) => ({
     meta: [
       { title: `Pedido #${params.id} — LogiFinder` },
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/pedidos/$id")({
 });
 
 function PedidoDetalhe() {
-  const { pedido } = Route.useLoaderData();
+  const { pedido } = Route.useLoaderData() as { pedido: NonNullable<ReturnType<typeof getPedido>> };
   const cliente = getCliente(pedido.clienteId);
   const carrier = getCarrier(pedido.transportadora);
 

@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { Mail, Phone, Shield, Building2 } from "lucide-react";
 
-export const Route = createFileRoute("/perfil")({
+export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
       { title: "Meu Perfil — LogiFinder" },

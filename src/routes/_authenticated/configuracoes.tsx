@@ -19,17 +19,12 @@ import {
   getRodonavesQuotationToken,
   rodonavesAdapter,
   DANUBIO_CIDADES_INICIAIS,
-  calculateDanubioFreight,
   importRodonavesSpreadsheet,
 } from "@/lib/carriers";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/configuracoes")({
-  component: () => (
-    <AppLayout>
-      <ConfiguracoesPage />
-    </AppLayout>
-  ),
+export const Route = createFileRoute("/_authenticated/configuracoes")({
+  component: () => <ConfiguracoesPage />,
 });
 
 function ConfiguracoesPage() {

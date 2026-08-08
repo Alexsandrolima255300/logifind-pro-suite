@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { PEDIDOS, OCORRENCIAS, BRL, getCliente, getCarrier } from "@/lib/mock/data";
 import { TrendingUp, ShoppingCart, DollarSign, Users, AlertTriangle, ArrowUpRight } from "lucide-react";
 
-export const Route = createFileRoute("/vendedor")({
+export const Route = createFileRoute("/_authenticated/vendedor")({
   head: () => ({
     meta: [
       { title: "Painel do Vendedor — LogiFinder" },

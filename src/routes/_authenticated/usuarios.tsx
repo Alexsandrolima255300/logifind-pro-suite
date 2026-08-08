@@ -5,7 +5,7 @@ import { USUARIOS } from "@/lib/mock/data";
 import { Plus, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/usuarios")({
+export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
     meta: [
       { title: "Usuários — LogiFinder" },
