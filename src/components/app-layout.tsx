@@ -114,8 +114,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           >
             <ChevronLeft className={cn("h-4 w-4 transition-transform duration-300", collapsed && "rotate-180")} />
           </button>
-          <Link
-            to="/login"
+          <button
+            onClick={handleSignOut}
             className={cn(
               "flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors",
               collapsed && "md:w-9 md:px-0 md:justify-center",
@@ -123,7 +123,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span className={cn("truncate", collapsed && "md:hidden")}>Sair</span>
-          </Link>
+          </button>
         </div>
       </aside>
 
