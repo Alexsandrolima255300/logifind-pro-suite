@@ -28,7 +28,7 @@ describe("Danúbio Freight Engine Tests", () => {
 
   it("should calculate cubagem correctly", () => {
     // 10x40x40 cm = 16.000 cm³ * 2 volumes = 32.000 cm³ = 0.032 m³
-    const items = [{ alturaCm: 10, larguraCm: 40, comprimentoCm: 40, quantidade: 2 }];
+    const items = [{ tipo: "Caixa", alturaCm: 10, larguraCm: 40, comprimentoCm: 40, quantidade: 2 }];
     const cub = calculateCubagem(items);
     expect(cub).toBe(0.032);
   });
