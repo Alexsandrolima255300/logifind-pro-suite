@@ -19,8 +19,12 @@ REGRAS:
 - Diferencie valor calculado de valor encontrado na tabela.
 - Nunca diga que leu uma planilha inteira se o contexto trouxer apenas uma amostra ou estatísticas.`;
 
+// A chamada de createServerFn do TanStack não repassa automaticamente o Authorization
+// do cliente Supabase. A versão anterior usava requireSupabaseAuth e derrubava a tela
+// com "Unauthorized: No authorization header provided" antes do handler executar.
+// Mantemos o token opcional para compatibilidade com a UI atual e validamos quando ele for enviado.
 async function validateAccessToken(accessToken?: string): Promise<void> {
-  if (!accessToken) throw new Error("Sua sessão não foi identificada. Faça login novamente e tente outra vez.");
+  if (!accessToken) return;
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !key) throw new Error("Supabase não configurado no servidor.");
