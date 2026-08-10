@@ -16,7 +16,8 @@ export type SheetAnalysis = {
 
 const toNumber = (value: unknown): number | null => {
   if (value === null || value === undefined || value === "") return null;
-  const text = String(value).trim().replace(/R\$\s?/gi, "").replace(/\./g, "").replace(/,/g, ".");
+  const raw = String(value).trim().replace(/R\$\s?/gi, "").replace(/\s/g, "");
+  const text = raw.includes(",") ? raw.replace(/\./g, "").replace(/,/g, ".") : raw;
   const n = Number(text);
   return Number.isFinite(n) ? n : null;
 };
@@ -50,7 +51,7 @@ export function analyzeSheet(preview: SheetPreview, fileName: string): SheetAnal
   const dateColumns = preview.headers.filter((name) => /data|date|vigencia|validade/i.test(name));
   return {
     fileName,
-    sheetCount: 1,
+    sheetCount: preview.sheetNames?.length ?? 1,
     rowCount: preview.rows.length,
     columns: preview.headers,
     mappedFields: preview.map,
