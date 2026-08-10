@@ -50,33 +50,117 @@ export async function deleteCoverage(id: string): Promise<void> {
   const { error } = await supabase.from("carrier_coverage").delete().eq("id", id); if (error) throw new Error(error.message);
 }
 
-const norm = (s: string) => normalizeCity(String(s ?? ""));
-const ALIASES: Record<keyof ParsedFields, string[]> = {
-  municipio_origem: ["municipio de origem", "municipio origem", "origem", "cidade origem", "cidade de origem"],
-  codigo_destino: ["codigo do destino", "codigo destino", "cod destino", "codigo", "cod"],
-  municipio_destino: ["municipio de destino", "municipio destino", "destino", "cidade destino", "cidade de destino", "municipio", "cidade"],
-  uf: ["uf", "estado", "sigla uf", "uf destino"], km: ["quilometragem", "km", "kms", "distancia", "distancia km"],
-  prazo_pj: ["prazo pj", "prazo pessoa juridica", "prazo juridica", "prazo entrega pj", "prazo"],
-  prazo_pf: ["prazo pf", "prazo pessoa fisica", "prazo fisica", "prazo entrega pf"],
-  frequencia: ["frequencia de atendimento", "frequencia", "atendimento"],
-  dias_semana: ["dias da semana", "dias semana", "dias", "dias de coleta entrega", "dias de atendimento"],
-  ativo: ["status", "ativo", "situacao"],
-};
 type ParsedFields = { municipio_origem: string; codigo_destino: string; municipio_destino: string; uf: string; km: string; prazo_pj: string; prazo_pf: string; frequencia: string; dias_semana: string; ativo: string };
 export type ColumnMap = Partial<Record<keyof ParsedFields, string>>;
+
+const norm = (s: string) => normalizeCity(String(s ?? ""));
+const ALIASES: Record<keyof ParsedFields, string[]> = {
+  municipio_origem: ["municipio de origem", "municipio origem", "cidade origem", "cidade de origem", "origem"],
+  codigo_destino: ["codigo do destino", "codigo destino", "cod destino", "codigo de destino", "codigo", "cod"],
+  municipio_destino: ["municipio de destino", "municipio destino", "municipio destinatario", "cidade destino", "cidade de destino", "cidade destinatario", "destino", "municipio", "cidade"],
+  uf: ["uf destino", "uf", "sigla uf", "estado destino", "estado", "est", "unidade federativa"],
+  km: ["quilometragem", "quilometros", "quilometro", "km", "kms", "distancia km", "distancia"],
+  prazo_pj: ["prazo pj", "prazo pessoa juridica", "prazo juridica", "prazo entrega pj", "prazo de entrega pj", "prazo"],
+  prazo_pf: ["prazo pf", "prazo pessoa fisica", "prazo fisica", "prazo entrega pf", "prazo de entrega pf"],
+  frequencia: ["frequencia de atendimento", "frequencia atendimento", "frequencia", "atendimento"],
+  dias_semana: ["dias da semana", "dias semana", "dias de coleta entrega", "dias de atendimento", "dias"],
+  ativo: ["status", "ativo", "situacao", "situacao cadastro"],
+};
+
+const FIELD_WORDS: Record<keyof ParsedFields, string[]> = {
+  municipio_origem: ["origem"], codigo_destino: ["codigo", "cod"], municipio_destino: ["destino", "municipio", "cidade"],
+  uf: ["uf", "estado"], km: ["km", "quilometragem", "distancia"], prazo_pj: ["prazo", "pj", "juridica"],
+  prazo_pf: ["prazo", "pf", "fisica"], frequencia: ["frequencia", "atendimento"], dias_semana: ["dias", "semana"], ativo: ["status", "ativo", "situacao"],
+};
+
+function scoreHeader(header: string, field: keyof ParsedFields): number {
+  const h = norm(header);
+  if (!h) return -1;
+  const aliases = ALIASES[field];
+  if (aliases.includes(h)) return 100;
+  const compact = h.replace(/\s+/g, " ");
+  let score = 0;
+  for (const alias of aliases) {
+    if (compact.includes(alias)) score = Math.max(score, 70 + Math.min(alias.length, 15));
+  }
+  const words = FIELD_WORDS[field];
+  const hits = words.filter((w) => compact.includes(w)).length;
+  score = Math.max(score, hits * 18);
+  // Não deixe uma coluna genérica "cidade" capturar campos que exigem destino/origem.
+  if (field === "municipio_destino" && /origem/.test(compact)) score -= 60;
+  if (field === "municipio_origem" && /destino/.test(compact)) score -= 60;
+  if (field === "prazo_pj" && /pf|fisica/.test(compact)) score -= 70;
+  if (field === "prazo_pf" && /pj|juridica/.test(compact)) score -= 70;
+  if (field === "codigo_destino" && /municipio|cidade|prazo|uf|estado/.test(compact)) score -= 50;
+  return score;
+}
+
+/** Mapeamento local determinístico. A importação NÃO depende de créditos de IA. */
 export function autoMapColumns(headers: string[]): ColumnMap {
-  const map: ColumnMap = {}; const used = new Set<string>();
-  for (const field of Object.keys(ALIASES) as (keyof ParsedFields)[]) {
-    const aliases = ALIASES[field];
-    let hit = headers.find((h) => !used.has(h) && aliases.includes(norm(h)));
-    if (!hit) hit = headers.find((h) => !used.has(h) && aliases.some((a) => norm(h).includes(a)));
-    if (hit) { map[field] = hit; used.add(hit); }
+  const map: ColumnMap = {};
+  const used = new Set<string>();
+  const fields = Object.keys(ALIASES) as (keyof ParsedFields)[];
+  // Primeiro pega correspondências exatas/fortes.
+  for (const field of fields) {
+    const ranked = headers
+      .filter((h) => !used.has(h))
+      .map((h) => ({ h, score: scoreHeader(h, field) }))
+      .filter((x) => x.score >= 70)
+      .sort((a, b) => b.score - a.score);
+    if (ranked[0]) { map[field] = ranked[0].h; used.add(ranked[0].h); }
+  }
+  // Depois tenta correspondências fracas somente para campos opcionais.
+  for (const field of fields) {
+    if (map[field] || field === "municipio_destino" || field === "uf") continue;
+    const ranked = headers
+      .filter((h) => !used.has(h))
+      .map((h) => ({ h, score: scoreHeader(h, field) }))
+      .sort((a, b) => b.score - a.score);
+    if (ranked[0] && ranked[0].score >= 18) { map[field] = ranked[0].h; used.add(ranked[0].h); }
   }
   return map;
 }
+
+function detectHeaderRow(matrix: unknown[][]): number {
+  let bestIndex = 0; let bestScore = -1;
+  for (let i = 0; i < Math.min(matrix.length, 30); i++) {
+    const cells = matrix[i].map((v) => String(v ?? "").trim()).filter(Boolean);
+    if (cells.length < 2) continue;
+    const normalized = cells.map(norm).join(" | ");
+    let score = Math.min(cells.length, 8);
+    if (/destino|municipio|cidade/.test(normalized)) score += 10;
+    if (/\buf\b|estado/.test(normalized)) score += 8;
+    if (/prazo|km|quilometragem|codigo|código/.test(normalized)) score += 4;
+    if (score > bestScore) { bestScore = score; bestIndex = i; }
+  }
+  return bestIndex;
+}
+
+function matrixToRows(matrix: unknown[][]): { headers: string[]; rows: Record<string, unknown>[] } {
+  const headerIndex = detectHeaderRow(matrix);
+  const rawHeaders = matrix[headerIndex] ?? [];
+  const headers: string[] = [];
+  const seen = new Map<string, number>();
+  rawHeaders.forEach((value, index) => {
+    let h = String(value ?? "").trim();
+    if (!h) h = `Coluna ${index + 1}`;
+    const n = seen.get(h) ?? 0; seen.set(h, n + 1);
+    headers.push(n ? `${h} (${n + 1})` : h);
+  });
+  const rows: Record<string, unknown>[] = [];
+  for (let i = headerIndex + 1; i < matrix.length; i++) {
+    const values = matrix[i] ?? [];
+    if (!values.some((v) => String(v ?? "").trim() !== "")) continue;
+    const row: Record<string, unknown> = {};
+    headers.forEach((h, index) => { row[h] = values[index] ?? ""; });
+    rows.push(row);
+  }
+  return { headers, rows };
+}
+
 const toNumber = (v: unknown): number | null => {
   if (v === null || v === undefined || v === "") return null;
-  const raw = String(v).trim().replace(/R\$\s?/gi, "");
+  const raw = String(v).trim().replace(/R\$\s?/gi, "").replace(/\s/g, "");
   const normalized = raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw;
   const n = Number(normalized); return Number.isFinite(n) ? n : null;
 };
@@ -94,13 +178,16 @@ export async function readSheet(file: File): Promise<SheetPreview> {
   const allRows: Record<string, unknown>[] = []; const allHeaders = new Set<string>();
   for (const sheetName of wb.SheetNames) {
     const ws = wb.Sheets[sheetName]; if (!ws) continue;
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "", raw: false });
-    for (const row of rows) {
+    const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: "", raw: false, blankrows: false });
+    const parsed = matrixToRows(matrix);
+    if (!parsed.rows.length) continue;
+    for (const row of parsed.rows) {
       allRows.push({ __aba: sheetName, ...row }); Object.keys(row).forEach((h) => allHeaders.add(h));
     }
   }
-  if (!allRows.length) throw new Error("Nenhuma linha encontrada na planilha.");
-  const headers = Array.from(allHeaders); const map = autoMapColumns(headers);
+  if (!allRows.length) throw new Error("Nenhuma linha de dados encontrada na planilha.");
+  const headers = Array.from(allHeaders).filter((h) => h !== "__aba");
+  const map = autoMapColumns(headers);
   return { headers, rows: allRows, map, sheetNames: wb.SheetNames };
 }
 
