@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 
@@ -24,9 +25,18 @@ function getLoadingLabel(pathname: string) {
 }
 
 export function LogiFinderLoading() {
-  const status = useRouterState({ select: (state) => state.status });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  if (status !== "pending") return null;
+  const [visible, setVisible] = useState(true);
+
+  // O loading é visual e temporário: nunca depende do estado interno do router.
+  // Cada troca de aba mostra a animação por no máximo 3 segundos.
+  useEffect(() => {
+    setVisible(true);
+    const timer = window.setTimeout(() => setVisible(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
+
+  if (!visible) return null;
 
   return (
     <>
