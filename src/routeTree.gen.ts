@@ -28,6 +28,7 @@ import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authen
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedCidadesRouteImport } from './routes/_authenticated/cidades'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
+import { Route as AuthenticatedTransportadorasIdRouteImport } from './routes/_authenticated/transportadoras.$id'
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 
 const DocumentacaoRoute = DocumentacaoRouteImport.update({
@@ -128,6 +129,12 @@ const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
   path: '/auditoria',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTransportadorasIdRoute =
+  AuthenticatedTransportadorasIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedTransportadorasRoute,
+  } as any)
 const AuthenticatedPedidosIdRoute = AuthenticatedPedidosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -150,10 +157,11 @@ export interface FileRoutesByFullPath {
   '/rastreamento': typeof AuthenticatedRastreamentoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/rodonaves': typeof AuthenticatedRodonavesRoute
-  '/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/transportadoras': typeof AuthenticatedTransportadorasRouteWithChildren
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendedor': typeof AuthenticatedVendedorRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
+  '/transportadoras/$id': typeof AuthenticatedTransportadorasIdRoute
 }
 export interface FileRoutesByTo {
   '/documentacao': typeof DocumentacaoRoute
@@ -170,11 +178,12 @@ export interface FileRoutesByTo {
   '/rastreamento': typeof AuthenticatedRastreamentoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/rodonaves': typeof AuthenticatedRodonavesRoute
-  '/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/transportadoras': typeof AuthenticatedTransportadorasRouteWithChildren
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendedor': typeof AuthenticatedVendedorRoute
   '/': typeof AuthenticatedIndexRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
+  '/transportadoras/$id': typeof AuthenticatedTransportadorasIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -193,11 +202,12 @@ export interface FileRoutesById {
   '/_authenticated/rastreamento': typeof AuthenticatedRastreamentoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/rodonaves': typeof AuthenticatedRodonavesRoute
-  '/_authenticated/transportadoras': typeof AuthenticatedTransportadorasRoute
+  '/_authenticated/transportadoras': typeof AuthenticatedTransportadorasRouteWithChildren
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/vendedor': typeof AuthenticatedVendedorRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
+  '/_authenticated/transportadoras/$id': typeof AuthenticatedTransportadorasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/usuarios'
     | '/vendedor'
     | '/pedidos/$id'
+    | '/transportadoras/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/documentacao'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/vendedor'
     | '/'
     | '/pedidos/$id'
+    | '/transportadoras/$id'
   id:
     | '__root__'
     | '/_authenticated'
@@ -264,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vendedor'
     | '/_authenticated/'
     | '/_authenticated/pedidos/$id'
+    | '/_authenticated/transportadoras/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -406,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/transportadoras/$id': {
+      id: '/_authenticated/transportadoras/$id'
+      path: '/$id'
+      fullPath: '/transportadoras/$id'
+      preLoaderRoute: typeof AuthenticatedTransportadorasIdRouteImport
+      parentRoute: typeof AuthenticatedTransportadorasRoute
+    }
     '/_authenticated/pedidos/$id': {
       id: '/_authenticated/pedidos/$id'
       path: '/$id'
@@ -427,6 +447,20 @@ const AuthenticatedPedidosRouteChildren: AuthenticatedPedidosRouteChildren = {
 const AuthenticatedPedidosRouteWithChildren =
   AuthenticatedPedidosRoute._addFileChildren(AuthenticatedPedidosRouteChildren)
 
+interface AuthenticatedTransportadorasRouteChildren {
+  AuthenticatedTransportadorasIdRoute: typeof AuthenticatedTransportadorasIdRoute
+}
+
+const AuthenticatedTransportadorasRouteChildren: AuthenticatedTransportadorasRouteChildren =
+  {
+    AuthenticatedTransportadorasIdRoute: AuthenticatedTransportadorasIdRoute,
+  }
+
+const AuthenticatedTransportadorasRouteWithChildren =
+  AuthenticatedTransportadorasRoute._addFileChildren(
+    AuthenticatedTransportadorasRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedCidadesRoute: typeof AuthenticatedCidadesRoute
@@ -441,7 +475,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRastreamentoRoute: typeof AuthenticatedRastreamentoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedRodonavesRoute: typeof AuthenticatedRodonavesRoute
-  AuthenticatedTransportadorasRoute: typeof AuthenticatedTransportadorasRoute
+  AuthenticatedTransportadorasRoute: typeof AuthenticatedTransportadorasRouteWithChildren
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedVendedorRoute: typeof AuthenticatedVendedorRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -461,7 +495,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRastreamentoRoute: AuthenticatedRastreamentoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedRodonavesRoute: AuthenticatedRodonavesRoute,
-  AuthenticatedTransportadorasRoute: AuthenticatedTransportadorasRoute,
+  AuthenticatedTransportadorasRoute:
+    AuthenticatedTransportadorasRouteWithChildren,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedVendedorRoute: AuthenticatedVendedorRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
@@ -477,13 +512,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

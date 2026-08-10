@@ -5,7 +5,7 @@ import { CARRIERS, COVERAGE, ESTADOS } from "@/lib/mock/data";
 import { Star, Check, X, Phone, Mail, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/transportadoras")({
+export const Route = createFileRoute("/_authenticated/transportadoras/")({
   head: () => ({
     meta: [
       { title: "Transportadoras — LogiFinder" },
