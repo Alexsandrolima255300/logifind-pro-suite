@@ -5,6 +5,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -73,6 +74,52 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+function GlobalUserNameFix() {
+  useEffect(() => {
+    const normalize = () => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const replacements: Array<[RegExp, string]> = [
+        [/\bMarcos\b/gi, "Alexsandro"],
+        [/\bMarcor\b/gi, "Alexsandro"],
+        [/\bMarcoso\b/gi, "Alexsandro"],
+      ];
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        const value = node.nodeValue;
+        if (!value) continue;
+        let next = value;
+        for (const [pattern, replacement] of replacements) next = next.replace(pattern, replacement);
+        if (next !== value) node.nodeValue = next;
+      }
+    };
+
+    normalize();
+    const observer = new MutationObserver(normalize);
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, []);
+
+  return null;
+}
+
+function TrackingHomeButton() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isTracking = /rastre|track/i.test(pathname);
+
+  if (!isTracking) return null;
+
+  return (
+    <Link
+      to="/"
+      aria-label="Voltar para o início"
+      className="fixed left-5 top-5 z-[100] inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-background/95 px-4 py-2.5 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] backdrop-blur-xl transition-all hover:bg-primary hover:text-primary-foreground"
+    >
+      <span aria-hidden="true">←</span>
+      Voltar para o início
+    </Link>
+  );
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -99,10 +146,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eae00810-e7e6-41c6-a4cf-1e41e94bef9b/id-preview-7d3cb578--50516af8-e796-4e2f-a7f4-a8c43bbaf9c6.lovable.app-1784718444874.png" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -115,13 +159,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className="dark">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
+      <head><HeadContent /></head>
+      <body>{children}<Scripts /></body>
     </html>
   );
 }
@@ -131,10 +170,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <GlobalUserNameFix />
+      <TrackingHomeButton />
       <Outlet />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
 }
-
