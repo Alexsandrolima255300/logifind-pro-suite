@@ -24,15 +24,14 @@ function getLoadingLabel(pathname: string) {
 }
 
 export function LogiFinderLoading() {
-  const isLoading = useRouterState({ select: (state) => state.isLoading });
+  const status = useRouterState({ select: (state) => state.status });
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  if (!isLoading) return null;
+  if (status !== "pending") return null;
 
   return (
     <>
       <style>{`
         @keyframes lf-slide{0%{transform:translateX(-120%)}50%{transform:translateX(25%)}100%{transform:translateX(120%)}}
-        @keyframes lf-spin{to{transform:rotate(360deg)}}
         @keyframes lf-pulse{0%,100%{transform:scale(.9);opacity:.5}50%{transform:scale(1.05);opacity:1}}
         @keyframes lf-ring{0%{transform:scale(.55);opacity:.8}100%{transform:scale(1.55);opacity:0}}
         @keyframes lf-dot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
