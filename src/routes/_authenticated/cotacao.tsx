@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
-import { QuoteEngine } from "@/components/quote-engine";
+import { PremiumQuoteEngine } from "@/components/premium-quote-engine";
 
 export const Route = createFileRoute("/_authenticated/cotacao")({
   head: () => ({
     meta: [
       { title: "Nova Cotação — LogiFinder" },
-      { name: "description", content: "Compare valores, prazos e cobertura das principais transportadoras do Brasil em uma única cotação inteligente." },
-      { property: "og:title", content: "Cotação Inteligente — LogiFinder" },
-      { property: "og:description", content: "Motor de cotação com cubagem, peso tarifável e filtro de cobertura por transportadora." },
+      { name: "description", content: "Cotação inteligente de fretes com consulta de CNPJ, CEP, cubagem e comparação de transportadoras." },
     ],
   }),
-  component: () => <AppLayout><QuoteEngine /></AppLayout>,
+  component: () => <AppLayout><PremiumQuoteEngine /></AppLayout>,
 });
