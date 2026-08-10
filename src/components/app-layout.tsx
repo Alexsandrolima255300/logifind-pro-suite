@@ -1,38 +1,20 @@
 import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  LayoutDashboard,
-  Search,
-  Truck,
-  FileText,
-  MapPin,
-  Settings,
-  ChevronLeft,
-  Bell,
-  Package,
-  ShoppingCart,
-  Users,
-  UserCircle,
-  BarChart3,
-  Radar,
-  BadgeDollarSign,
-  Building2,
-  BookOpen,
-} from "lucide-react";
+import { BarChart3, Bell, BookOpen, Building2, ChevronLeft, FileText, LayoutDashboard, MapPin, Menu, Package, Radar, Search, Settings, ShoppingCart, Truck, UserCircle, Users, X, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIFab } from "./ai-fab";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/cotacao", label: "Nova Cotação", icon: Search },
-  { to: "/pedidos", label: "Pedidos", icon: ShoppingCart },
-  { to: "/rastreamento", label: "Rastreamento", icon: Radar },
-  { to: "/vendedor", label: "Painel do Vendedor", icon: BadgeDollarSign },
   { to: "/transportadoras", label: "Transportadoras", icon: Truck },
   { to: "/clientes", label: "Clientes", icon: Building2 },
   { to: "/cidades", label: "Cidades", icon: MapPin },
+  { to: "/pedidos", label: "Pedidos", icon: ShoppingCart },
+  { to: "/rastreamento", label: "Rastreamento", icon: Radar },
   { to: "/historico", label: "Histórico", icon: FileText },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/vendedor", label: "Painel do Vendedor", icon: Zap },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/usuarios", label: "Usuários", icon: Users },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
@@ -44,101 +26,60 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const activeItem = nav.find((item) => pathname === item.to) ?? nav.find((item) => item.to !== "/" && pathname.startsWith(item.to));
 
   return (
-    <div className="flex min-h-screen w-full text-foreground">
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+    <div className="lf-shell min-h-screen w-full">
+      {mobileOpen && <button aria-label="Fechar menu" className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
 
-      <aside
-        className={cn(
-          "glass-strong fixed z-50 flex h-screen flex-col border-r border-white/[0.06] transition-all duration-500 ease-out",
-          collapsed ? "md:w-[76px]" : "md:w-[248px]",
-          "w-[260px]",
-          mobileOpen ? "left-0" : "-left-72 md:left-0",
-        )}
-      >
-        <div className="flex h-16 items-center gap-3 px-5 border-b border-white/[0.05] shrink-0">
-          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-[0_0_20px_-4px_oklch(0.62_0.22_255/0.6)]">
-            <Package className="h-5 w-5 text-white" strokeWidth={2.5} />
-            <span className="absolute inset-0 rounded-xl animate-pulse-ring" />
+      <aside className={cn("lf-sidebar fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300", collapsed ? "md:w-[82px]" : "md:w-[270px]", mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0", "w-[280px]")}>
+        <div className="flex h-[78px] items-center gap-3 border-b border-white/7 px-5">
+          <div className="lf-logo"><Package className="h-5 w-5" /></div>
+          <div className={cn("min-w-0", collapsed && "md:hidden")}>
+            <div className="text-[17px] font-black tracking-tight">Logi<span className="text-primary">Finder</span></div>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">TMS • Inteligência logística</div>
           </div>
-          <div className={cn("min-w-0 transition-opacity", collapsed && "md:opacity-0 md:pointer-events-none")}>
-            <div className="text-[15px] font-bold tracking-tight leading-tight">
-              Logi<span className="text-gradient-blue">Finder</span>
-            </div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">TMS · Cotação Inteligente</div>
-          </div>
+          <button className="ml-auto rounded-lg p-2 text-muted-foreground hover:bg-white/5 md:hidden" onClick={() => setMobileOpen(false)}><X className="h-4 w-4" /></button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
-          {nav.map((item, i) => {
-            const active = pathname === item.to;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300",
-                  active
-                    ? "bg-primary/15 text-primary shadow-[inset_0_1px_0_oklch(1_0_0/0.05)]"
-                    : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
-                )}
-                style={{ animationDelay: `${i * 30}ms` }}
-              >
-                {active && (
-                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_oklch(0.62_0.22_255/0.8)]" />
-                )}
-                <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2} />
-                <span className={cn("truncate transition-opacity", collapsed && "md:opacity-0 md:pointer-events-none md:w-0")}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+        <div className={cn("px-4 pt-5", collapsed && "md:px-3")}>
+          <div className={cn("mb-3 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground", collapsed && "md:hidden")}>Operação</div>
+          <nav className="space-y-1">
+            {nav.map((item) => {
+              const active = pathname === item.to || (item.to !== "/" && pathname.startsWith(item.to));
+              const Icon = item.icon;
+              return <Link key={item.to} to={item.to} onClick={() => setMobileOpen(false)} title={collapsed ? item.label : undefined} className={cn("lf-nav-item", active && "active", collapsed && "md:justify-center md:px-0")}>
+                <Icon className="h-[18px] w-[18px] shrink-0" />
+                <span className={cn(collapsed && "md:hidden")}>{item.label}</span>
+              </Link>;
+            })}
+          </nav>
+        </div>
 
-        <div className="p-3 border-t border-white/[0.05] shrink-0 flex items-center justify-between">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-white/[0.05] hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className={cn("h-4 w-4 transition-transform duration-300", collapsed && "rotate-180")} />
-          </button>
+        <div className="mt-auto space-y-3 border-t border-white/7 p-4">
+          <div className={cn("lf-user-card", collapsed && "md:justify-center md:p-2")}>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary"><UserCircle className="h-5 w-5" /></div>
+            <div className={cn("min-w-0", collapsed && "md:hidden")}><p className="truncate text-sm font-semibold">Alexsandro</p><p className="text-[10px] text-muted-foreground">Administrador</p></div>
+          </div>
+          <button onClick={() => setCollapsed(!collapsed)} className="hidden w-full items-center justify-center gap-2 rounded-xl border border-white/7 py-2 text-xs text-muted-foreground transition hover:border-primary/30 hover:text-primary md:flex"><ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />{!collapsed && "Recolher menu"}</button>
         </div>
       </aside>
 
-      <div className={cn("flex flex-1 flex-col transition-all duration-500 ease-out", collapsed ? "md:pl-[76px]" : "md:pl-[248px]")}>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.06] bg-background/80 px-6 backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-muted-foreground md:hidden"
-            >
-              <Package className="h-5 w-5" />
-            </button>
-            <div className="text-sm font-semibold tracking-tight">Painel Principal</div>
+      <div className={cn("min-h-screen transition-[padding] duration-300", collapsed ? "md:pl-[82px]" : "md:pl-[270px]")}>
+        <header className="lf-topbar sticky top-0 z-30 flex h-[78px] items-center justify-between px-4 md:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <button onClick={() => setMobileOpen(true)} className="rounded-xl border border-white/8 p-2.5 text-muted-foreground hover:text-primary md:hidden"><Menu className="h-5 w-5" /></button>
+            <div className="min-w-0"><p className="truncate text-xs font-medium text-muted-foreground">Você está em</p><h2 className="truncate text-base font-bold">{activeItem?.label ?? "Dashboard"}</h2></div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/notificacoes"
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-muted-foreground hover:text-foreground hover:border-white/20 transition-colors"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
-            </Link>
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link to="/cotacao" className="lf-top-action hidden sm:inline-flex"><Zap className="h-4 w-4 text-primary" /> Nova cotação</Link>
+            <Link to="/notificacoes" className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/[0.02] text-muted-foreground hover:border-primary/30 hover:text-primary"><Bell className="h-4 w-4" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_currentColor]" /></Link>
+            <Link to="/perfil" className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-1.5 pr-3 hover:border-primary/30"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary"><UserCircle className="h-4 w-4" /></span><span className="hidden text-xs font-semibold sm:block">Alexsandro</span></Link>
           </div>
         </header>
 
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">{children}</main>
+        <main className="mx-auto w-full max-w-[1540px] px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
-
       <AIFab />
     </div>
   );
