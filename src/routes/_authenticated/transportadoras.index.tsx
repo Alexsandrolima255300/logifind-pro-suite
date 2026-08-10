@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
 import { PageHeader } from "@/components/page-header";
 import { CARRIERS, COVERAGE, ESTADOS } from "@/lib/mock/data";
-import { Star, Check, X, Phone, Mail, Globe } from "lucide-react";
+import { Star, Check, X, Phone, Mail, Globe, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/transportadoras")({
+
+export const Route = createFileRoute("/_authenticated/transportadoras/")({
   head: () => ({
     meta: [
       { title: "Transportadoras — LogiFinder" },
@@ -21,11 +22,17 @@ function Transportadoras() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-[1440px] p-4 md:p-8 space-y-6">
-        <PageHeader eyebrow="Cadastro · Cobertura" title="Transportadoras" description="Cadastros ativos e matriz de cobertura por unidade federativa." />
+        <PageHeader eyebrow="Cadastro · Cobertura" title="Transportadoras" description="Clique em uma transportadora para editar tarifas, prazos e as cidades atendidas — com importação de planilhas por IA." />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {CARRIERS.map((c, i) => (
-            <div key={c.id} className="glass rounded-2xl p-5 hover:border-primary/30 transition animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: `${i * 60}ms` }}>
+            <Link
+              key={c.id}
+              to="/transportadoras/$id"
+              params={{ id: c.id }}
+              className="glass rounded-2xl p-5 block text-left hover:border-primary/40 hover:-translate-y-0.5 transition animate-in fade-in slide-in-from-bottom-4"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-base font-bold">{c.nome}</div>
@@ -45,9 +52,13 @@ function Transportadoras() {
                 <div className="flex items-center gap-2"><Mail className="h-3 w-3" /> {c.email}</div>
                 <div className="flex items-center gap-2"><Globe className="h-3 w-3" /> {c.site}</div>
               </div>
-            </div>
+              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <Pencil className="h-3 w-3" /> Editar cadastro e cidades
+              </div>
+            </Link>
           ))}
         </div>
+
 
         <div className="glass rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-white/[0.05]">
