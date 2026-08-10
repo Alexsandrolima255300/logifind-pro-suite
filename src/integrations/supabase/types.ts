@@ -68,6 +68,54 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_settings: {
+        Row: {
+          ad_valorem: number
+          ativo: boolean
+          carrier_id: string
+          created_at: string
+          fator_cubagem: number
+          frete_minimo: number
+          gris: number
+          nome: string
+          observacoes: string | null
+          percentual_nf: number
+          prazo_padrao: number | null
+          updated_at: string
+          valor_por_kg: number
+        }
+        Insert: {
+          ad_valorem?: number
+          ativo?: boolean
+          carrier_id: string
+          created_at?: string
+          fator_cubagem?: number
+          frete_minimo?: number
+          gris?: number
+          nome?: string
+          observacoes?: string | null
+          percentual_nf?: number
+          prazo_padrao?: number | null
+          updated_at?: string
+          valor_por_kg?: number
+        }
+        Update: {
+          ad_valorem?: number
+          ativo?: boolean
+          carrier_id?: string
+          created_at?: string
+          fator_cubagem?: number
+          frete_minimo?: number
+          gris?: number
+          nome?: string
+          observacoes?: string | null
+          percentual_nf?: number
+          prazo_padrao?: number | null
+          updated_at?: string
+          valor_por_kg?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
