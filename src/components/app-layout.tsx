@@ -3,7 +3,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, Bell, BookOpen, Building2, FileText, LayoutDashboard, MapPin, Menu, Package, Radar, Search, Settings, ShoppingCart, Truck, UserCircle, Users, X, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIFab } from "./ai-fab";
-import { LogisticsTabVisual } from "./logistics-tab-visual";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard }, { to: "/cotacao", label: "Nova Cotação", icon: Search },
@@ -73,7 +72,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2 md:gap-3"><Link to="/cotacao" className="lf-top-action hidden sm:inline-flex"><Zap className="h-4 w-4 text-primary" /> Nova cotação</Link><Link to="/notificacoes" className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/[0.02] text-muted-foreground hover:border-primary/30 hover:text-primary"><Bell className="h-4 w-4" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_currentColor]" /></Link><Link to="/perfil" className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-1.5 pr-3 hover:border-primary/30"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary"><UserCircle className="h-4 w-4" /></span><span className="hidden text-xs font-semibold sm:block">Alexsandro</span></Link></div>
         </header>
         <main className="mx-auto w-full max-w-[1540px] px-4 py-6 md:px-8 md:py-8">
-          <LogisticsTabVisual />
           {children}
         </main>
       </div>
