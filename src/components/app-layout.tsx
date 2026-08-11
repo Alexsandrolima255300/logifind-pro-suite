@@ -13,7 +13,7 @@ const nav = [
   { to: "/pedidos", label: "Pedidos", icon: ShoppingCart },
   { to: "/rastreamento", label: "Rastreamento", icon: Radar },
   { to: "/historico", label: "Histórico", icon: FileText },
-  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/relatorios", label: "Diretoria", icon: BarChart3 },
   { to: "/vendedor", label: "Painel do Vendedor", icon: Zap },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/usuarios", label: "Usuários", icon: Users },
@@ -31,7 +31,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="lf-shell min-h-screen w-full">
       {mobileOpen && <button aria-label="Fechar menu" className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
-
       <aside className={cn("lf-sidebar fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300", collapsed ? "md:w-[82px]" : "md:w-[270px]", mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0", "w-[280px]")}>
         <div className="flex h-[78px] items-center gap-3 border-b border-white/7 px-5">
           <div className="lf-logo"><Package className="h-5 w-5" /></div>
@@ -41,7 +40,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <button className="ml-auto rounded-lg p-2 text-muted-foreground hover:bg-white/5 md:hidden" onClick={() => setMobileOpen(false)}><X className="h-4 w-4" /></button>
         </div>
-
         <div className={cn("px-4 pt-5", collapsed && "md:px-3")}>
           <div className={cn("mb-3 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground", collapsed && "md:hidden")}>Operação</div>
           <nav className="space-y-1">
@@ -55,7 +53,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             })}
           </nav>
         </div>
-
         <div className="mt-auto space-y-3 border-t border-white/7 p-4">
           <div className={cn("lf-user-card", collapsed && "md:justify-center md:p-2")}>
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary"><UserCircle className="h-5 w-5" /></div>
@@ -64,7 +61,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <button onClick={() => setCollapsed(!collapsed)} className="hidden w-full items-center justify-center gap-2 rounded-xl border border-white/7 py-2 text-xs text-muted-foreground transition hover:border-primary/30 hover:text-primary md:flex"><ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />{!collapsed && "Recolher menu"}</button>
         </div>
       </aside>
-
       <div className={cn("min-h-screen transition-[padding] duration-300", collapsed ? "md:pl-[82px]" : "md:pl-[270px]")}>
         <header className="lf-topbar sticky top-0 z-30 flex h-[78px] items-center justify-between px-4 md:px-8">
           <div className="flex min-w-0 items-center gap-3">
@@ -77,7 +73,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <Link to="/perfil" className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-1.5 pr-3 hover:border-primary/30"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary"><UserCircle className="h-4 w-4" /></span><span className="hidden text-xs font-semibold sm:block">Alexsandro</span></Link>
           </div>
         </header>
-
         <main className="mx-auto w-full max-w-[1540px] px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
       <AIFab />
