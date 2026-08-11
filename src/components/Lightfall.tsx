@@ -37,7 +37,7 @@ const DEFAULT_COLORS = ["#FFB15C", "#FF7A00", "#FF4D00"];
 
 export default function Lightfall({
   className = "",
-  colors = DEFAULT_COLORS,
+  colors,
   backgroundColor = "#1A0A00",
   speed = 0.5,
   streakCount = 2,
@@ -50,6 +50,11 @@ export default function Lightfall({
   mouseInteraction = true,
   mouseStrength = 0.5,
   mouseRadius = 1,
+  zoom = 1,
+  backgroundGlow = 1,
+  color1,
+  color2,
+  color3,
 }: LightfallProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
