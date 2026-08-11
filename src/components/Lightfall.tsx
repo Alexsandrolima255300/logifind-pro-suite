@@ -15,6 +15,11 @@ export interface LightfallProps {
   mouseInteraction?: boolean;
   mouseStrength?: number;
   mouseRadius?: number;
+  zoom?: number;
+  backgroundGlow?: number;
+  color1?: string;
+  color2?: string;
+  color3?: string;
 }
 
 type Particle = {
@@ -32,7 +37,7 @@ const DEFAULT_COLORS = ["#FFB15C", "#FF7A00", "#FF4D00"];
 
 export default function Lightfall({
   className = "",
-  colors = DEFAULT_COLORS,
+  colors,
   backgroundColor = "#1A0A00",
   speed = 0.5,
   streakCount = 2,
@@ -45,8 +50,16 @@ export default function Lightfall({
   mouseInteraction = true,
   mouseStrength = 0.5,
   mouseRadius = 1,
+  zoom = 1,
+  backgroundGlow = 1,
+  color1,
+  color2,
+  color3,
 }: LightfallProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const palette = [color1, color2, color3].filter(Boolean).length
+    ? ([color1!, color2!, color3!] as string[])
+    : (colors ?? DEFAULT_COLORS);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,7 +75,7 @@ export default function Lightfall({
     const mouse = { x: 0.72, y: 0.45, targetX: 0.72, targetY: 0.45 };
     let particles: Particle[] = [];
 
-    const colorAt = (index: number) => colors[index % Math.max(colors.length, 1)] ?? DEFAULT_COLORS[1];
+    const colorAt = (index: number) => palette[index % Math.max(palette.length, 1)] ?? DEFAULT_COLORS[1];
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
@@ -107,12 +120,14 @@ export default function Lightfall({
       const centerX = width * 0.7;
       const centerY = height * 0.46;
       const bgGlow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.72);
-      bgGlow.addColorStop(0, `rgba(255, 122, 0, ${0.16 * glow})`);
-      bgGlow.addColorStop(0.38, `rgba(255, 89, 0, ${0.07 * glow})`);
+      bgGlow.addColorStop(0, `rgba(255, 122, 0, ${0.16 * glow * backgroundGlow})`);
+      bgGlow.addColorStop(0.38, `rgba(255, 89, 0, ${0.07 * glow * backgroundGlow})`);
       bgGlow.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = bgGlow;
       ctx.fillRect(0, 0, width, height);
 
+      ctx.save();
+      ctx.scale(zoom, zoom);
       ctx.globalCompositeOperation = "lighter";
       particles.forEach((p) => {
         p.y += p.speed * dt * (0.65 + speed);
@@ -166,6 +181,7 @@ export default function Lightfall({
         ctx.fill();
       }
 
+      ctx.restore();
       ctx.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(draw);
     };
@@ -181,7 +197,7 @@ export default function Lightfall({
       observer.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
     };
-  }, [backgroundColor, colors, density, glow, mouseInteraction, mouseRadius, mouseStrength, opacity, speed, streakCount, streakLength, streakWidth, twinkle]);
+  }, [backgroundColor, palette, density, glow, mouseInteraction, mouseRadius, mouseStrength, opacity, speed, streakCount, streakLength, streakWidth, twinkle, zoom, backgroundGlow]);
 
   return (
     <canvas
