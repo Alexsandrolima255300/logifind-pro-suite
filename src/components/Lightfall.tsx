@@ -120,12 +120,14 @@ export default function Lightfall({
       const centerX = width * 0.7;
       const centerY = height * 0.46;
       const bgGlow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.72);
-      bgGlow.addColorStop(0, `rgba(255, 122, 0, ${0.16 * glow})`);
-      bgGlow.addColorStop(0.38, `rgba(255, 89, 0, ${0.07 * glow})`);
+      bgGlow.addColorStop(0, `rgba(255, 122, 0, ${0.16 * glow * backgroundGlow})`);
+      bgGlow.addColorStop(0.38, `rgba(255, 89, 0, ${0.07 * glow * backgroundGlow})`);
       bgGlow.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = bgGlow;
       ctx.fillRect(0, 0, width, height);
 
+      ctx.save();
+      ctx.scale(zoom, zoom);
       ctx.globalCompositeOperation = "lighter";
       particles.forEach((p) => {
         p.y += p.speed * dt * (0.65 + speed);
