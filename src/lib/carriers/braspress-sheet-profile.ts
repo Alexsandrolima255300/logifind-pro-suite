@@ -1,0 +1,28 @@
+export const BRASPRESS_SHEET_PROFILE = {
+  carrierId: "braspress",
+  carrierName: "Braspress",
+  sourceFile: "Rodoviario com percurso Tarifa - UBA - GAB 1 (5).xlsx",
+  sheetName: "Percurso Tarifa - UBA",
+  sourceOrigin: "Uberaba/MG",
+  rowsAnalyzed: 10664,
+  headerRow: 2,
+  columns: {
+    municipio: "Municipios",
+    uf: "UF",
+    filialAtendimento: "Filial Atendimento",
+    cepInicial: "CEP Inicial",
+    cepFinal: "CEP Final",
+    tipoLocal: "Tipo Local",
+    percursoTarifa: "Percurso Tarifa",
+    prazoDias: "PRAZO",
+  },
+  rules: [
+    "Uma linha representa um município/distrito e sua faixa de CEP de atendimento.",
+    "UF deve ser considerada junto com o município para evitar homônimos.",
+    "CEP Inicial e CEP Final definem a faixa de CEP coberta quando informada.",
+    "PRAZO é o prazo de entrega em dias para o percurso indicado.",
+    "Filial Atendimento identifica a unidade Braspress responsável pelo destino.",
+    "Tipo Local diferencia MUNICÍPIO e DISTRITO.",
+    "Percurso Tarifa identifica a rota/faixa tarifária usada pela malha.",
+  ],
+} as const;
