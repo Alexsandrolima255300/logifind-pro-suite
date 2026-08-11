@@ -15,11 +15,77 @@ const recent = [
   ["COT-8238", "Porto Alegre/RS", "Florianópolis/SC", "Alfa", "R$ 720,00", "Recusada"],
 ];
 
+function BrazilMapAnimation() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute -right-12 -top-20 h-[430px] w-[620px] opacity-[0.22] blur-[0.2px] md:-right-4 md:-top-24 md:h-[500px] md:w-[700px]">
+        <svg viewBox="0 0 700 500" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lfBrazilStroke" x1="160" y1="80" x2="570" y2="430" gradientUnits="userSpaceOnUse">
+              <stop stopColor="currentColor" stopOpacity="0.95" />
+              <stop offset="1" stopColor="currentColor" stopOpacity="0.25" />
+            </linearGradient>
+            <radialGradient id="lfBrazilGlow" cx="0" cy="0" r="1" gradientTransform="translate(385 235) rotate(90) scale(205 240)">
+              <stop stopColor="currentColor" stopOpacity="0.28" />
+              <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+            </radialGradient>
+            <filter id="lfMapGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <clipPath id="lfBrazilClip">
+              <path d="M153 76 188 59 220 67 243 54 275 62 303 48 337 60 367 49 400 65 432 62 455 78 489 82 514 101 543 108 562 132 585 143 594 169 617 187 608 213 621 232 609 252 617 278 598 293 594 321 574 334 563 361 536 371 522 397 496 402 478 427 451 432 431 452 398 447 375 462 349 448 324 456 300 441 271 446 255 425 227 419 215 397 191 390 187 365 166 352 171 326 151 308 158 280 145 258 159 233 151 210 164 188 151 166 164 145 150 122 164 102Z" />
+            </clipPath>
+          </defs>
+
+          <path d="M153 76 188 59 220 67 243 54 275 62 303 48 337 60 367 49 400 65 432 62 455 78 489 82 514 101 543 108 562 132 585 143 594 169 617 187 608 213 621 232 609 252 617 278 598 293 594 321 574 334 563 361 536 371 522 397 496 402 478 427 451 432 431 452 398 447 375 462 349 448 324 456 300 441 271 446 255 425 227 419 215 397 191 390 187 365 166 352 171 326 151 308 158 280 145 258 159 233 151 210 164 188 151 166 164 145 150 122 164 102Z" fill="url(#lfBrazilGlow)" className="text-primary" />
+          <path d="M153 76 188 59 220 67 243 54 275 62 303 48 337 60 367 49 400 65 432 62 455 78 489 82 514 101 543 108 562 132 585 143 594 169 617 187 608 213 621 232 609 252 617 278 598 293 594 321 574 334 563 361 536 371 522 397 496 402 478 427 451 432 431 452 398 447 375 462 349 448 324 456 300 441 271 446 255 425 227 419 215 397 191 390 187 365 166 352 171 326 151 308 158 280 145 258 159 233 151 210 164 188 151 166 164 145 150 122 164 102Z" stroke="url(#lfBrazilStroke)" strokeWidth="2.2" className="text-primary" filter="url(#lfMapGlow)" />
+
+          <g clipPath="url(#lfBrazilClip)" className="text-primary">
+            <g opacity="0.34" stroke="currentColor" strokeWidth="1">
+              <path d="M185 80 220 430M240 65 275 445M300 55 325 450M365 55 350 450M430 68 395 445M490 88 445 430M545 118 500 400" />
+              <path d="M160 150 580 145M150 205 610 205M150 265 615 265M160 325 590 325M185 385 555 385" />
+            </g>
+            <g stroke="currentColor" strokeWidth="1.5" strokeDasharray="5 9" opacity="0.55">
+              <path d="M215 345 C260 285 305 300 345 250 S425 185 490 155" />
+              <path d="M180 215 C245 230 285 180 345 205 S430 280 535 300" />
+              <path d="M255 410 C300 365 350 350 405 380 S480 405 520 365" />
+            </g>
+          </g>
+
+          <g className="text-primary" filter="url(#lfMapGlow)">
+            {[
+              [214, 344, 0], [275, 292, 0.4], [345, 250, 0.8], [418, 201, 1.2], [490, 155, 1.6],
+              [181, 215, 0.25], [286, 204, 0.7], [350, 207, 1.1], [432, 265, 1.5], [535, 300, 1.9],
+              [255, 410, 0.5], [350, 352, 1], [445, 385, 1.5], [520, 365, 2],
+            ].map(([cx, cy, delay], index) => (
+              <circle key={index} cx={cx} cy={cy} r="3.2" fill="currentColor">
+                <animate attributeName="r" values="2.2;5.5;2.2" dur="2.8s" begin={`${delay}s`} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.25;0.95;0.25" dur="2.8s" begin={`${delay}s`} repeatCount="indefinite" />
+              </circle>
+            ))}
+          </g>
+
+          <circle cx="345" cy="250" r="8" stroke="currentColor" strokeWidth="1" opacity="0.35" className="text-primary">
+            <animate attributeName="r" values="8;32;8" dur="3.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.45;0;0.45" dur="3.2s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+      </div>
+      <div className="absolute right-[18%] top-[24%] h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/90 to-transparent" />
+    </div>
+  );
+}
+
 export function PremiumDashboard() {
   return <div className="space-y-7">
-    <section className="lf-hero min-h-[190px]">
-      <div><p className="text-xs font-black uppercase tracking-[.2em] text-primary">LogiFinder • Painel executivo</p><h1 className="mt-3 text-3xl font-black md:text-5xl">Seja bem-vindo de volta, <span className="text-primary">Alexsandro</span></h1><p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Tudo que você precisa para cotar, comparar e acompanhar seus fretes em um único lugar.</p></div>
-      <div className="flex gap-2"><Link to="/cotacao" className="lf-primary"><Plus className="h-4 w-4" /> Nova cotação</Link><Link to="/relatorios" className="lf-secondary"><BarChart3 className="h-4 w-4" /> Relatórios</Link></div>
+    <section className="lf-hero relative min-h-[190px] overflow-hidden">
+      <BrazilMapAnimation />
+      <div className="relative z-10 flex min-h-[190px] flex-col justify-between gap-7">
+        <div><p className="text-xs font-black uppercase tracking-[.2em] text-primary">LogiFinder • Painel executivo</p><h1 className="mt-3 text-3xl font-black md:text-5xl">Seja bem-vindo de volta, <span className="text-primary">Alexsandro</span></h1><p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Tudo que você precisa para cotar, comparar e acompanhar seus fretes em um único lugar.</p></div>
+        <div className="flex gap-2"><Link to="/cotacao" className="lf-primary"><Plus className="h-4 w-4" /> Nova cotação</Link><Link to="/relatorios" className="lf-secondary"> <BarChart3 className="h-4 w-4" /> Relatórios</Link></div>
+      </div>
     </section>
 
     <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
