@@ -15,6 +15,11 @@ export interface LightfallProps {
   mouseInteraction?: boolean;
   mouseStrength?: number;
   mouseRadius?: number;
+  zoom?: number;
+  backgroundGlow?: number;
+  color1?: string;
+  color2?: string;
+  color3?: string;
 }
 
 type Particle = {
