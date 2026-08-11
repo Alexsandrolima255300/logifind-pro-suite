@@ -57,6 +57,9 @@ export default function Lightfall({
   color3,
 }: LightfallProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const palette = [color1, color2, color3].filter(Boolean).length
+    ? ([color1!, color2!, color3!] as string[])
+    : (colors ?? DEFAULT_COLORS);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,7 +75,7 @@ export default function Lightfall({
     const mouse = { x: 0.72, y: 0.45, targetX: 0.72, targetY: 0.45 };
     let particles: Particle[] = [];
 
-    const colorAt = (index: number) => colors[index % Math.max(colors.length, 1)] ?? DEFAULT_COLORS[1];
+    const colorAt = (index: number) => palette[index % Math.max(palette.length, 1)] ?? DEFAULT_COLORS[1];
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
