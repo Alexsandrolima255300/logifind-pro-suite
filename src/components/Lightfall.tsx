@@ -181,6 +181,7 @@ export default function Lightfall({
         ctx.fill();
       }
 
+      ctx.restore();
       ctx.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(draw);
     };
