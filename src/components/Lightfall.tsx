@@ -197,7 +197,7 @@ export default function Lightfall({
       observer.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
     };
-  }, [backgroundColor, colors, density, glow, mouseInteraction, mouseRadius, mouseStrength, opacity, speed, streakCount, streakLength, streakWidth, twinkle]);
+  }, [backgroundColor, palette, density, glow, mouseInteraction, mouseRadius, mouseStrength, opacity, speed, streakCount, streakLength, streakWidth, twinkle, zoom, backgroundGlow]);
 
   return (
     <canvas
